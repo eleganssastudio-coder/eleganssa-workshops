@@ -62,17 +62,9 @@ nav .nav-links{ display:flex; gap:24px; }
 .workshop-divider h2{ font-family:"Playfair Display",serif; font-size:40px; margin:0 0 6px; color:var(--dark); }
 .workshop-divider p{ font-family:Lora,serif; font-style:italic; font-size:19px; margin:0; color:var(--dark); }
 
-.section-hero{ width:100%; height:65vh; background-size:cover; background-position:center; position:relative; }
-.section-hero-overlay{ position:absolute; inset:0; background:linear-gradient(to bottom,rgba(0,0,0,.2) 0%,rgba(0,0,0,0) 100%); }
-@media(max-width:768px){
-  .section-hero{
-    height:50vw;
-    min-height:200px;
-    max-height:350px;
-    background-size:cover;
-    background-position:center center;
-  }
-}
+.section-hero{ width:100%; overflow:hidden; }
+.section-hero img{ width:100%; height:auto; display:block; }
+
 
 .container{ max-width:1100px; margin:auto; padding:50px 25px; }
 h2{ font-family:"Playfair Display",serif; font-size:32px; margin-top:60px; color:var(--dark); }
@@ -233,7 +225,7 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
     <h2>Jesmonite декор</h2>
     <p>Модерен декор за дома, направен от теб</p>
   </div>
-  <div class="section-hero" style="background-image:url('images/hero.jpg');"><div class="section-hero-overlay"></div></div>
+  <div class="section-hero"><img src="images/hero.jpg" alt="Jesmonite работилница"></div>
   <section class="container intro">
     <div class="card-dark-jes" style="text-align:center;">
       <p style="font-size:18px;font-family:'Playfair Display',serif;">Jesmonite е материал, който мълчи -<br>докато не го сложиш в ръцете си. Тогава се подчинява изцяло на теб. </p>
@@ -326,7 +318,7 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
     <h2>Соева свещ</h2>
     <p>Твой аромат, твоя светлина</p>
   </div>
-  <div class="section-hero" style="background-image:url('images/candle-hero.jpg');"><div class="section-hero-overlay"></div></div>
+  <div class="section-hero"><img src="images/candle-hero.jpg" alt="Соева свещ работилница"></div>
   <section class="container intro">
     <div class="card-dark-can" style="text-align:center;">
       <p style="font-size:18px;font-family:'Playfair Display',serif;">Соевата свещ е просто една вещ, която стои на рафта докато не я запалиш.<br>Тогава се превръща в твоя аромат, твоята светлина.</p>
