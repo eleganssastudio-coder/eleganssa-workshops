@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>За нас | Eleganssa Studio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:ital,wght@0,400;1,400&family=Lato:wght@400;700&display=swap');
+
+:root{
+  --bg:#f5efe8; --dark:#3a2010; --accent-jes:#3A5068; --accent-can:#9a543d;
+  --gold:#c8a86b; --card-dark:#6f7165; --card-light:#e8d8cc; --cream:#fdf6ee;
+}
+*{ box-sizing:border-box; }
+body{ margin:0; background:var(--bg); color:var(--dark); font-family:Lato,sans-serif; }
+
+/* NAV */
+nav{ position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(42,32,20,.92); backdrop-filter:blur(8px); padding:12px 30px; display:flex; align-items:center; justify-content:space-between; }
+nav a{ color:var(--cream); text-decoration:none; font-size:14px; font-weight:700; }
+nav .logo{ font-family:"Playfair Display",serif; font-size:18px; }
+nav .nav-links{ display:flex; gap:24px; }
+@media(max-width:768px){ nav .nav-links{ display:none; } }
+
+/* HERO */
+.about-hero{
+  padding-top:80px;
+  background:linear-gradient(to bottom, #2c3e50 0%, #4a3728 100%);
+  text-align:center;
+  padding-bottom:60px;
+  padding-left:25px;
+  padding-right:25px;
+}
+.about-hero p.label{
+  font-family:Lora,serif; font-style:italic;
+  font-size:16px; color:rgba(253,246,238,.65);
+  letter-spacing:2px; margin:0 0 12px;
+}
+.about-hero h1{
+  font-family:"Playfair Display",serif;
+  font-size:52px; color:var(--cream);
+  line-height:1.1; margin:0 0 20px;
+}
+.about-hero .tagline{
+  font-family:Lora,serif; font-style:italic;
+  font-size:22px; color:var(--gold);
+  margin:0;
+}
+@media(max-width:600px){ .about-hero h1{ font-size:34px; } .about-hero .tagline{ font-size:18px; } }
+
+/* LAYOUT */
+.container{ max-width:900px; margin:auto; padding:50px 25px; }
+.container-wide{ max-width:1100px; margin:auto; padding:50px 25px; }
+h2{ font-family:"Playfair Display",serif; font-size:34px; color:var(--dark); margin:0 0 20px; }
+h3{ font-family:"Playfair Display",serif; font-size:22px; color:var(--dark); margin:0 0 8px; }
+p{ font-size:17px; line-height:1.8; color:#4a3020; margin:0 0 16px; }
+
+/* STORY */
+.story-section{ background:var(--cream); }
+.story-text{ max-width:680px; }
+.italic{ font-family:Lora,serif; font-style:italic; }
+
+/* FOUNDER */
+.founder-section{ background:var(--bg); }
+.founder-grid{ display:grid; grid-template-columns:1fr 2fr; gap:50px; align-items:center; }
+.founder-photo{
+  width:100%; aspect-ratio:3/4;
+  border-radius:20px;
+  background:var(--card-dark);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+.founder-photo img{ width:100%; height:100%; object-fit:cover; }
+.founder-photo .ph{
+  color:var(--cream); font-size:13px; opacity:.6;
+  text-align:center; padding:20px; line-height:1.6;
+}
+@media(max-width:700px){ .founder-grid{ grid-template-columns:1fr; } .founder-photo{ aspect-ratio:4/3; } }
+
+/* VALUES */
+.values-section{ background:#2c3e50; }
+.values-section h2{ color:var(--cream); }
+.values-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:24px; margin-top:30px; }
+@media(max-width:600px){ .values-grid{ grid-template-columns:1fr; } }
+.value-card{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(253,246,238,.12);
+  border-radius:18px; padding:28px;
+}
+.value-icon{ font-size:28px; margin-bottom:12px; }
+.value-card h3{ color:var(--cream); font-size:20px; margin-bottom:8px; }
+.value-card p{ color:rgba(253,246,238,.8); font-size:15px; line-height:1.7; margin:0; }
+
+/* MATERIALS */
+.materials-section{ background:var(--cream); }
+.materials-grid{ display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:24px; }
+@media(max-width:600px){ .materials-grid{ grid-template-columns:1fr; } }
+.material-card{
+  background:var(--bg);
+  border-radius:18px; padding:28px;
+  border-left:4px solid var(--gold);
+}
+.material-card h3{ color:var(--dark); margin-bottom:10px; }
+.material-card p{ color:#4a3020; font-size:15px; line-height:1.7; margin:0; }
+
+/* VIDEOS */
+.videos-section{ background:var(--bg); }
+.videos-grid{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:24px; }
+@media(max-width:700px){ .videos-grid{ grid-template-columns:1fr; } }
+.video-placeholder{
+  background:var(--card-dark);
+  border-radius:16px;
+  aspect-ratio:16/9;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:12px;
+}
+.video-placeholder svg{ width:48px; height:48px; fill:rgba(253,246,238,.4); }
+.video-placeholder p{ color:rgba(253,246,238,.5); font-size:13px; margin:0; text-align:center; }
+/* When you have YouTube links, replace .video-placeholder with: */
+/* <iframe width="100%" style="aspect-ratio:16/9;border-radius:16px;border:none;" src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen></iframe> */
+
+/* CLOSING */
+.closing-section{
+  background:var(--card-dark);
+  text-align:center; padding:60px 25px;
+}
+.closing-section h2{ color:var(--cream); font-size:38px; margin-bottom:12px; }
+.closing-section p{ color:rgba(253,246,238,.85); font-size:19px; font-family:Lora,serif; font-style:italic; max-width:600px; margin:0 auto; }
+
+/* BACK LINK */
+.back-btn{
+  display:inline-block;
+  margin-top:30px;
+  background:var(--cream); color:var(--card-dark);
+  font-weight:700; padding:13px 28px; border-radius:40px;
+  text-decoration:none; font-size:15px;
+}
+
+/* FOOTER */
+footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center; font-size:14px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="index.html">Eleganssa Studio</a>
+  <div class="nav-links">
+    <a href="index.html#jesmonite">Jesmonite</a>
+    <a href="index.html#sveshti">Соева свещ</a>
+    <a href="about.html" style="color:var(--gold);">За нас</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="about-hero">
+  <p class="label">Eleganssa Studio</p>
+  <h1>За нас</h1>
+  <p class="tagline">Пространство, където занаятът среща изкуството</p>
+</div>
+
+<!-- STORY -->
+<div class="story-section">
+  <div class="container">
+    <h2>Нашата история</h2>
+    <div class="story-text">
+      <p>Създадох студиото с една проста идея — да правя красиви, функционални предмети, които носят спокойствие и характер в модерния дом. Всяко парче, което напуска нашето студио, носи отпечатъка на ръцете, които са го създали.</p>
+      <p class="italic" style="font-size:19px; color:var(--accent-can); border-left:3px solid var(--gold); padding-left:20px; margin-top:24px;">Eleganssa Studio е пространство, където занаятът среща изкуството.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FOUNDER -->
+<div class="founder-section">
+  <div class="container">
+    <div class="founder-grid">
+      <div class="founder-photo">
+        <!-- Замени с: <img src="images/founder.jpg" alt="Създател на Eleganssa Studio"> -->
+        <div class="ph">Снимка на<br>създателя<br>на бранда<br><br>добави по-късно</div>
+      </div>
+      <div>
+        <p style="font-family:Lora,serif;font-style:italic;font-size:13px;letter-spacing:1px;color:var(--gold);margin-bottom:8px;">СЪЗДАТЕЛ</p>
+        <h2 style="margin-bottom:16px;">[Твоето име]</h2>
+        <p>Работим изключително с екологични материали. Jesmonite е невероятна алтернатива на бетона и смолата — той е на водна основа, без разтворители и напълно безопасен. Соевият восък за нашите свещи гори чисто, не отделя токсини и разпръсква ароматите много по-нежно.</p>
+        <p>Студиото не е само място за производство — то е място за споделяне. Чрез нашите работилници ние предаваме знанията си и създаваме пространство за творчество и срещи.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VALUES -->
+<div class="values-section">
+  <div class="container-wide">
+    <h2>Нашите ценности</h2>
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="value-icon">🌿</div>
+        <h3>Бавно създаване</h3>
+        <p>Вярваме в процеса. Не бързаме. Всяка стъпка — от смесването на пигментите до финалното полиране — изисква своето време и внимание.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">✦</div>
+        <h3>Уникалност</h3>
+        <p>Красотата на ръчния труд се крие в несъвършенствата. Малките въздушни мехурчета, фините вариации в цвета и различните шарки правят всяко изделие абсолютно неповторимо.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">◯</div>
+        <h3>Естетика</h3>
+        <p>Търсим баланса между минимализъм и характер. Формите са изчистени, цветовете са вдъхновени от природата, а текстурите приканват да бъдат докоснати.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">◇</div>
+        <h3>Общност</h3>
+        <p>Чрез нашите работилници ние предаваме знанията си и създаваме пространство за творчество и срещи между хора, които ценят ръчния труд.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MATERIALS -->
+<div class="materials-section">
+  <div class="container">
+    <h2>Материалите, с които работим</h2>
+    <div class="materials-grid">
+      <div class="material-card">
+        <h3>Jesmonite</h3>
+        <p>Невероятна алтернатива на бетона и смолата — на водна основа, без разтворители и напълно безопасен. Лек, издръжлив и с безкрайни визуални възможности.</p>
+      </div>
+      <div class="material-card">
+        <h3>Соев восък</h3>
+        <p>Гори чисто, не отделя токсини и разпръсква ароматите много по-нежно от парафина. Естествен, биоразградим и с по-дълго горене.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEOS -->
+<div class="videos-section">
+  <div class="container-wide">
+    <h2>Вижте ни в действие</h2>
+    <p style="color:#6a5040; margin-bottom:0;">Видеа от нашите работилници — процесът, атмосферата, хората.</p>
+    <div class="videos-grid">
+
+      <!-- VIDEO 1 — замени с YouTube embed когато имаш линк: -->
+      <!-- <iframe width="100%" style="aspect-ratio:16/9;border-radius:16px;border:none;" src="https://www.youtube.com/embed/ТВОЯ_VIDEO_ID" allowfullscreen></iframe> -->
+      <div class="video-placeholder">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <p>Видео от Jesmonite работилница<br>добави YouTube линк по-късно</p>
+      </div>
+
+      <!-- VIDEO 2 -->
+      <div class="video-placeholder">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <p>Видео от Соева свещ работилница<br>добави YouTube линк по-késno</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- CLOSING -->
+<div class="closing-section">
+  <h2>Създаваме повече от предмети.</h2>
+  <p>Създаваме усещане.</p>
+  <a class="back-btn" href="index.html">← Обратно към работилниците</a>
+</div>
+
+<footer>
+  ЕКОЛОГИЧЕН МАТЕРИАЛ | РЪЧНА ИЗРАБОТКА | ТВОРЧЕСТВО И УДОВОЛСТВИЕ<br>
+  <span style="opacity:.6;margin-top:6px;display:block;">© 2025 Eleganssa Studio</span>
+</footer>
+
+</body>
+</html>
