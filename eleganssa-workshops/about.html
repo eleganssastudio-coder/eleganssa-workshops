@@ -5,213 +5,256 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>За нас | Eleganssa Studio</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:ital,wght@0,400;1,400&family=Lato:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lora:ital@1&family=Lato:wght@400;700&display=swap');
 
 :root{
-  --bg:#f5efe8; --dark:#3a2010; --accent-jes:#3A5068; --accent-can:#9a543d;
-  --gold:#c8a86b; --card-dark:#6f7165; --card-light:#e8d8cc; --cream:#fdf6ee;
+  --bg:#f5efe8; --dark:#2c3e50; --accent:#3A5068;
+  --gold:#c8a86b; --cream:#fdf6ee; --muted:#6a7a8a;
+  --card:#ffffff; --border:#e8e0d8;
 }
-*{ box-sizing:border-box; }
-body{ margin:0; background:var(--bg); color:var(--dark); font-family:Lato,sans-serif; }
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ background:var(--bg); color:var(--dark); font-family:Lato,sans-serif; }
 
 /* NAV */
-nav{ position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(42,32,20,.92); backdrop-filter:blur(8px); padding:12px 30px; display:flex; align-items:center; justify-content:space-between; }
-nav a{ color:var(--cream); text-decoration:none; font-size:14px; font-weight:700; }
-nav .logo{ font-family:"Playfair Display",serif; font-size:18px; }
-nav .nav-links{ display:flex; gap:24px; }
-@media(max-width:768px){ nav .nav-links{ display:none; } }
-
-/* HERO */
-.about-hero{
-  padding-top:80px;
-  background:linear-gradient(to bottom, #2c3e50 0%, #4a3728 100%);
-  text-align:center;
-  padding-bottom:60px;
-  padding-left:25px;
-  padding-right:25px;
+nav{
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  background:rgba(253,246,238,.96); backdrop-filter:blur(8px);
+  padding:16px 40px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--border);
 }
-.about-hero p.label{
-  font-family:Lora,serif; font-style:italic;
-  font-size:16px; color:rgba(253,246,238,.65);
-  letter-spacing:2px; margin:0 0 12px;
-}
-.about-hero h1{
-  font-family:"Playfair Display",serif;
-  font-size:52px; color:var(--cream);
-  line-height:1.1; margin:0 0 20px;
-}
-.about-hero .tagline{
-  font-family:Lora,serif; font-style:italic;
-  font-size:22px; color:var(--gold);
-  margin:0;
-}
-@media(max-width:600px){ .about-hero h1{ font-size:34px; } .about-hero .tagline{ font-size:18px; } }
+.nav-logo{ font-family:"Playfair Display",serif; font-size:20px; color:var(--dark); text-decoration:none; }
+.nav-links{ display:flex; gap:32px; }
+.nav-links a{ color:var(--muted); text-decoration:none; font-size:14px; font-weight:700; letter-spacing:.3px; transition:color .2s; }
+.nav-links a:hover{ color:var(--dark); }
+.nav-links a.active{ color:var(--dark); }
+@media(max-width:768px){ .nav-links{ display:none; } }
 
 /* LAYOUT */
-.container{ max-width:900px; margin:auto; padding:50px 25px; }
-.container-wide{ max-width:1100px; margin:auto; padding:50px 25px; }
-h2{ font-family:"Playfair Display",serif; font-size:34px; color:var(--dark); margin:0 0 20px; }
-h3{ font-family:"Playfair Display",serif; font-size:22px; color:var(--dark); margin:0 0 8px; }
-p{ font-size:17px; line-height:1.8; color:#4a3020; margin:0 0 16px; }
+.page{ padding-top:72px; }
+.section{ padding:80px 40px; }
+.section-narrow{ max-width:900px; margin:auto; }
+.section-wide{ max-width:1200px; margin:auto; }
+@media(max-width:600px){ .section{ padding:50px 24px; } }
 
-/* STORY */
-.story-section{ background:var(--cream); }
-.story-text{ max-width:680px; }
-.italic{ font-family:Lora,serif; font-style:italic; }
-
-/* FOUNDER */
-.founder-section{ background:var(--bg); }
-.founder-grid{ display:grid; grid-template-columns:1fr 2fr; gap:50px; align-items:center; }
-.founder-photo{
+/* HERO SECTION */
+.hero-section{
+  padding:100px 40px 80px;
+  background:var(--cream);
+}
+.hero-inner{
+  max-width:1200px; margin:auto;
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:80px; align-items:center;
+}
+.hero-text h1{
+  font-family:"Playfair Display",serif;
+  font-size:52px; line-height:1.1;
+  color:var(--dark); margin-bottom:24px;
+}
+.hero-text .lead{
+  font-family:"Playfair Display",serif;
+  font-style:italic;
+  font-size:20px; line-height:1.6;
+  color:var(--accent); margin-bottom:24px;
+}
+.hero-text p{
+  font-size:16px; line-height:1.8;
+  color:#4a5568; margin-bottom:16px;
+}
+.hero-img{
   width:100%; aspect-ratio:3/4;
-  border-radius:20px;
-  background:var(--card-dark);
-  display:flex; align-items:center; justify-content:center;
-  overflow:hidden;
+  border-radius:20px; overflow:hidden;
+  background:#c8bdb5;
 }
-.founder-photo img{ width:100%; height:100%; object-fit:cover; }
-.founder-photo .ph{
-  color:var(--cream); font-size:13px; opacity:.6;
-  text-align:center; padding:20px; line-height:1.6;
+.hero-img img{ width:100%; height:100%; object-fit:cover; }
+@media(max-width:768px){
+  .hero-inner{ grid-template-columns:1fr; gap:40px; }
+  .hero-text h1{ font-size:36px; }
+  .hero-img{ aspect-ratio:4/3; }
 }
-@media(max-width:700px){ .founder-grid{ grid-template-columns:1fr; } .founder-photo{ aspect-ratio:4/3; } }
 
 /* VALUES */
-.values-section{ background:#2c3e50; }
-.values-section h2{ color:var(--cream); }
-.values-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:24px; margin-top:30px; }
+.values-section{ background:var(--bg); }
+.values-header{ text-align:center; margin-bottom:50px; }
+.values-header h2{
+  font-family:"Playfair Display",serif;
+  font-size:38px; color:var(--dark); margin-bottom:12px;
+}
+.values-header p{ font-size:16px; color:var(--muted); }
+.values-grid{
+  display:grid; grid-template-columns:repeat(2,1fr);
+  gap:24px;
+}
 @media(max-width:600px){ .values-grid{ grid-template-columns:1fr; } }
 .value-card{
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(253,246,238,.12);
-  border-radius:18px; padding:28px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px; padding:32px;
 }
-.value-icon{ font-size:28px; margin-bottom:12px; }
-.value-card h3{ color:var(--cream); font-size:20px; margin-bottom:8px; }
-.value-card p{ color:rgba(253,246,238,.8); font-size:15px; line-height:1.7; margin:0; }
+.value-icon{
+  width:44px; height:44px; margin-bottom:16px;
+}
+.value-icon svg{
+  width:44px; height:44px;
+  stroke:var(--accent); fill:none;
+  stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round;
+}
+.value-card h3{
+  font-family:"Playfair Display",serif;
+  font-size:20px; color:var(--dark); margin-bottom:10px;
+}
+.value-card p{ font-size:15px; line-height:1.7; color:#4a5568; }
 
 /* MATERIALS */
 .materials-section{ background:var(--cream); }
-.materials-grid{ display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:24px; }
+.materials-grid{
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:24px; margin-top:40px;
+}
 @media(max-width:600px){ .materials-grid{ grid-template-columns:1fr; } }
 .material-card{
-  background:var(--bg);
-  border-radius:18px; padding:28px;
-  border-left:4px solid var(--gold);
+  background:var(--card);
+  border-radius:16px; padding:32px;
+  border-left:3px solid var(--gold);
 }
-.material-card h3{ color:var(--dark); margin-bottom:10px; }
-.material-card p{ color:#4a3020; font-size:15px; line-height:1.7; margin:0; }
+.material-card h3{
+  font-family:"Playfair Display",serif;
+  font-size:20px; color:var(--dark); margin-bottom:10px;
+}
+.material-card p{ font-size:15px; line-height:1.7; color:#4a5568; }
+.section-title{
+  font-family:"Playfair Display",serif;
+  font-size:38px; color:var(--dark); margin-bottom:12px;
+}
+.section-sub{ font-size:16px; color:var(--muted); margin-bottom:0; }
 
 /* VIDEOS */
 .videos-section{ background:var(--bg); }
-.videos-grid{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:24px; }
+.videos-grid{
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:24px; margin-top:40px;
+}
 @media(max-width:700px){ .videos-grid{ grid-template-columns:1fr; } }
-.video-placeholder{
-  background:var(--card-dark);
-  border-radius:16px;
-  aspect-ratio:16/9;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  gap:12px;
+.videos-grid iframe{
+  width:100%; aspect-ratio:16/9;
+  border-radius:16px; border:none;
+  display:block;
 }
-.video-placeholder svg{ width:48px; height:48px; fill:rgba(253,246,238,.4); }
-.video-placeholder p{ color:rgba(253,246,238,.5); font-size:13px; margin:0; text-align:center; }
-/* When you have YouTube links, replace .video-placeholder with: */
-/* <iframe width="100%" style="aspect-ratio:16/9;border-radius:16px;border:none;" src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen></iframe> */
 
-/* CLOSING */
+/* CLOSING HERO */
 .closing-section{
-  background:var(--card-dark);
-  text-align:center; padding:60px 25px;
+  position:relative; overflow:hidden;
+  min-height:380px;
+  display:flex; align-items:center; justify-content:center;
+  text-align:center;
 }
-.closing-section h2{ color:var(--cream); font-size:38px; margin-bottom:12px; }
-.closing-section p{ color:rgba(253,246,238,.85); font-size:19px; font-family:Lora,serif; font-style:italic; max-width:600px; margin:0 auto; }
-
-/* BACK LINK */
+.closing-bg{
+  position:absolute; inset:0;
+  background-image:url('images/about-hero.jpg');
+  background-size:cover; background-position:center;
+  background-color:#4a3728;
+}
+.closing-overlay{
+  position:absolute; inset:0;
+  background:rgba(20,15,8,.55);
+}
+.closing-content{
+  position:relative; z-index:1;
+  padding:60px 40px;
+}
+.closing-content h2{
+  font-family:"Playfair Display",serif;
+  font-size:44px; color:#fff;
+  line-height:1.2; margin-bottom:12px;
+  text-shadow:0 2px 20px rgba(0,0,0,.4);
+}
+.closing-content p{
+  font-family:Lora,serif; font-style:italic;
+  font-size:20px; color:rgba(255,255,255,.85);
+  text-shadow:0 1px 10px rgba(0,0,0,.3);
+}
 .back-btn{
-  display:inline-block;
-  margin-top:30px;
-  background:var(--cream); color:var(--card-dark);
-  font-weight:700; padding:13px 28px; border-radius:40px;
-  text-decoration:none; font-size:15px;
+  display:inline-block; margin-top:28px;
+  background:var(--cream); color:var(--dark);
+  font-weight:700; font-size:14px;
+  padding:12px 28px; border-radius:40px;
+  text-decoration:none; transition:opacity .2s;
 }
+.back-btn:hover{ opacity:.85; }
+@media(max-width:600px){ .closing-content h2{ font-size:30px; } }
 
 /* FOOTER */
-footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center; font-size:14px; }
+footer{
+  background:var(--dark); color:var(--cream);
+  padding:28px 40px; text-align:center; font-size:13px;
+  opacity:.9;
+}
 </style>
 </head>
 <body>
+<div class="page">
 
 <!-- NAV -->
 <nav>
-  <a class="logo" href="index.html">Eleganssa Studio</a>
+  <a class="nav-logo" href="index.html">Eleganssa Studio</a>
   <div class="nav-links">
     <a href="index.html#jesmonite">Jesmonite</a>
     <a href="index.html#sveshti">Соева свещ</a>
-    <a href="about.html" style="color:var(--gold);">За нас</a>
+    <a href="index.html#schedule-jes">Записване</a>
+    <a href="about.html" class="active">За нас</a>
   </div>
 </nav>
 
 <!-- HERO -->
-<div class="about-hero">
-  <p class="label">Eleganssa Studio</p>
-  <h1>За нас</h1>
-  <p class="tagline">Пространство, където занаятът среща изкуството</p>
-</div>
-
-<!-- STORY -->
-<div class="story-section">
-  <div class="container">
-    <h2>Нашата история</h2>
-    <div class="story-text">
+<div class="hero-section">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <h1>За нас</h1>
+      <p class="lead">Eleganssa Studio е пространство, където занаятът среща изкуството.</p>
       <p>Създадох студиото с една проста идея — да правя красиви, функционални предмети, които носят спокойствие и характер в модерния дом. Всяко парче, което напуска нашето студио, носи отпечатъка на ръцете, които са го създали.</p>
-      <p class="italic" style="font-size:19px; color:var(--accent-can); border-left:3px solid var(--gold); padding-left:20px; margin-top:24px;">Eleganssa Studio е пространство, където занаятът среща изкуството.</p>
+      <p>Работим изключително с екологични материали. Jesmonite е невероятна алтернатива на бетона и смолата — той е на водна основа, без разтворители и напълно безопасен. Соевият восък за нашите свещи гори чисто, не отделя токсини и разпръсква ароматите много по-нежно.</p>
     </div>
-  </div>
-</div>
-
-<!-- FOUNDER -->
-<div class="founder-section">
-  <div class="container">
-    <div class="founder-grid">
-      <div class="founder-photo">
-        <!-- Замени с: <img src="images/founder.jpg" alt="Създател на Eleganssa Studio"> -->
-        <div class="ph"><img src="images/founder.jpg" alt="Създател на Eleganssa Studio"></div>
-      </div>
-      <div>
-        <p style="font-family:Lora,serif;font-style:italic;font-size:13px;letter-spacing:1px;color:var(--gold);margin-bottom:8px;">СЪЗДАТЕЛ</p>
-        <h2 style="margin-bottom:16px;">Светлана Михова</h2>
-        <p>Работим изключително с екологични материали. Jesmonite е невероятна алтернатива на бетона и смолата - той е на водна основа, без разтворители и напълно безопасен. Соевият восък за нашите свещи гори чисто, не отделя токсини и разпръсква ароматите много по-нежно.</p>
-        <p>Студиото не е само място за производство - то е място за споделяне. Чрез нашите работилници ние предаваме знанията си и създаваме пространство за творчество и срещи.</p>
-      </div>
+    <div class="hero-img">
+      <img src="images/founder.jpg" alt="Създател на Eleganssa Studio">
     </div>
   </div>
 </div>
 
 <!-- VALUES -->
 <div class="values-section">
-  <div class="container-wide">
-    <h2>Нашите ценности</h2>
-    <div class="values-grid">
-      <div class="value-card">
-        <div class="value-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--cream)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-        <h3>Бавно създаване</h3>
-        <p>Вярваме в процеса. Не бързаме. Всяка стъпка - от смесването на пигментите до финалното полиране - изисква своето време и внимание.</p>
+  <div class="section">
+    <div class="section-wide">
+      <div class="values-header">
+        <h2 class="section-title">Нашите ценности</h2>
+        <p class="section-sub">Принципите, които ръководят всяко наше изделие</p>
       </div>
-      <div class="value-card">
-        <div class="value-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--cream)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-        <h3>Уникалност</h3>
-        <p>Красотата на ръчния труд се крие в несъвършенствата. Малките въздушни мехурчета, фините вариации в цвета и различните шарки правят всяко изделие абсолютно неповторимо.</p>
-      </div>
-      <div class="value-card">
-        <div class="value-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--cream)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></div>
-        <h3>Естетика</h3>
-        <p>Търсим баланса между минимализъм и характер. Формите са изчистени, цветовете са вдъхновени от природата, а текстурите приканват да бъдат докоснати.</p>
-      </div>
-      <div class="value-card">
-        <div class="value-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--cream)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-        <h3>Общност</h3>
-        <p>Чрез нашите работилници ние предаваме знанията си и създаваме пространство за творчество и срещи между хора, които ценят ръчния труд.</p>
+      <div class="values-grid">
+
+        <div class="value-card">
+          <div class="value-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <h3>Бавно създаване</h3>
+          <p>Вярваме в процеса. Не бързаме. Всяка стъпка — от смесването на пигментите до финалното полиране — изисква своето време и внимание.</p>
+        </div>
+
+        <div class="value-card">
+          <div class="value-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <h3>Уникалност</h3>
+          <p>Красотата на ръчния труд се крие в несъвършенствата. Малките въздушни мехурчета, фините вариации в цвета и различните шарки правят всяко изделие абсолютно неповторимо.</p>
+        </div>
+
+        <div class="value-card">
+          <div class="value-icon"><svg viewBox="0 0 24 24"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <h3>Естетика</h3>
+          <p>Търсим баланса между минимализъм и характер. Формите са изчистени, цветовете са вдъхновени от природата, а текстурите приканват да бъдат докоснати.</p>
+        </div>
+
+        <div class="value-card">
+          <div class="value-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <h3>Общност</h3>
+          <p>Студиото не е само място за производство — то е място за споделяне. Чрез нашите работилници ние предаваме знанията си и създаваме пространство за творчество и срещи.</p>
+        </div>
+
       </div>
     </div>
   </div>
@@ -219,16 +262,19 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
 
 <!-- MATERIALS -->
 <div class="materials-section">
-  <div class="container">
-    <h2>Материалите, с които работим</h2>
-    <div class="materials-grid">
-      <div class="material-card">
-        <h3>Jesmonite</h3>
-        <p>Невероятна алтернатива на бетона и смолата — на водна основа, без разтворители и напълно безопасен. Лек, издръжлив и с безкрайни визуални възможности.</p>
-      </div>
-      <div class="material-card">
-        <h3>Соев восък</h3>
-        <p>Гори чисто, не отделя токсини и разпръсква ароматите много по-нежно от парафина. Естествен, биоразградим и с по-дълго горене.</p>
+  <div class="section">
+    <div class="section-narrow">
+      <h2 class="section-title">Материалите, с които работим</h2>
+      <p class="section-sub">Избираме само екологични, безопасни материали с душа</p>
+      <div class="materials-grid">
+        <div class="material-card">
+          <h3>Jesmonite</h3>
+          <p>Невероятна алтернатива на бетона и смолата — на водна основа, без разтворители и напълно безопасен. Лек, издръжлив и с безкрайни визуални възможности.</p>
+        </div>
+        <div class="material-card">
+          <h3>Соев восък</h3>
+          <p>Гори чисто, не отделя токсини и разпръсква ароматите много по-нежно от парафина. Естествен, биоразградим и с по-дълго горене.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -236,28 +282,34 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
 
 <!-- VIDEOS -->
 <div class="videos-section">
-  <div class="container-wide">
-    <h2>Вижте ни в действие</h2>
-    <p style="color:#6a5040; margin-bottom:0;">Видеа от нашите работилници — процесът, атмосферата, хората.</p>
-    <div class="videos-grid">
-      <iframe width="100%" style="aspect-ratio:16/9;border-radius:16px;border:none;" src="https://www.youtube.com/embed/lDd8vBOtMOc" title="Jesmonite работилница" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-      <iframe width="100%" style="aspect-ratio:16/9;border-radius:16px;border:none;" src="https://www.youtube.com/embed/_mDthWh4xqI" title="Соева свещ работилница" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  <div class="section">
+    <div class="section-wide">
+      <h2 class="section-title">Вижте ни в действие</h2>
+      <p class="section-sub">Видеа от нашите работилници — процесът, атмосферата, хората.</p>
+      <div class="videos-grid">
+        <iframe src="https://www.youtube.com/embed/lDd8vBOtMOc" title="Jesmonite работилница" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        <iframe src="https://www.youtube.com/embed/_mDthWh4xqI" title="Соева свещ работилница" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
     </div>
-   </div>
- </div>
+  </div>
 </div>
 
 <!-- CLOSING -->
 <div class="closing-section">
-  <h2>Създаваме повече от предмети.</h2>
-  <p>Създаваме усещане.</p>
-  <a class="back-btn" href="index.html">← Обратно към работилниците</a>
+  <div class="closing-bg"></div>
+  <div class="closing-overlay"></div>
+  <div class="closing-content">
+    <h2>Създаваме повече от предмети.</h2>
+    <p>Създаваме усещане.</p>
+    <a class="back-btn" href="index.html">← Обратно към работилниците</a>
+  </div>
 </div>
 
 <footer>
   ЕКОЛОГИЧЕН МАТЕРИАЛ | РЪЧНА ИЗРАБОТКА | ТВОРЧЕСТВО И УДОВОЛСТВИЕ<br>
-  <span style="opacity:.6;margin-top:6px;display:block;">© 2026 Eleganssa Studio</span>
+  <span style="opacity:.6;margin-top:6px;display:block;">© 2025 Eleganssa Studio</span>
 </footer>
 
+</div>
 </body>
 </html>
