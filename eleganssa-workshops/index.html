@@ -194,6 +194,48 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
   .stat-label{ font-size:12px; }
 }
 
+
+/* ── Hamburger Menu ── */
+.burger{
+  display:none;
+  flex-direction:column;
+  justify-content:center;
+  gap:5px;
+  cursor:pointer;
+  padding:4px;
+  background:none;
+  border:none;
+  z-index:200;
+}
+.burger span{
+  display:block;
+  width:24px;
+  height:2px;
+  background:var(--dark);
+  border-radius:2px;
+  transition:all .3s;
+}
+.burger.open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+.burger.open span:nth-child(2){ opacity:0; }
+.burger.open span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+@media(max-width:768px){
+  .burger{ display:flex; }
+  .nav-links{
+    display:none;
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background:rgba(253,246,238,.98);
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:32px;
+    z-index:150;
+  }
+  .nav-links.open{ display:flex; }
+  .nav-links a{ font-size:20px; }
+}
+
 </style>
 </head>
 <body>
@@ -207,7 +249,9 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
     <a href="#schedule-can">Записване Свещ</a>
     <a href="about.html" style="color:var(--gold);">За нас</a>
     <a href="contact.html" style="color:var(--gold);">Контакти</a>
-  </div>
+    <button class="burger" id="burger" aria-label="Меню">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
 <!-- MAIN HERO -->
@@ -428,6 +472,22 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
   ЕКОЛОГИЧЕН МАТЕРИАЛ | РЪЧНА ИЗРАБОТКА | ТВОРЧЕСТВО И УДОВОЛСТВИЕ<br>
   <span style="opacity:.6;margin-top:6px;display:block;">© 2026 Eleganssa Studio</span>
 </footer>
+
+
+<script>
+const burger = document.getElementById('burger');
+const navLinks = document.querySelector('.nav-links');
+burger.addEventListener('click', function(){
+  burger.classList.toggle('open');
+  navLinks.classList.toggle('open');
+});
+navLinks.querySelectorAll('a').forEach(function(a){
+  a.addEventListener('click', function(){
+    burger.classList.remove('open');
+    navLinks.classList.remove('open');
+  });
+});
+</script>
 
 </body>
 </html>

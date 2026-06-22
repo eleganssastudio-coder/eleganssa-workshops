@@ -110,6 +110,48 @@ nav{ position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(253,24
 footer{ background:var(--dark); color:var(--cream); padding:28px 40px; text-align:center; font-size:13px; }
 footer a{ color:rgba(253,246,238,.6); text-decoration:none; margin:0 8px; }
 footer a:hover{ color:var(--cream); }
+
+/* ── Hamburger Menu ── */
+.burger{
+  display:none;
+  flex-direction:column;
+  justify-content:center;
+  gap:5px;
+  cursor:pointer;
+  padding:4px;
+  background:none;
+  border:none;
+  z-index:200;
+}
+.burger span{
+  display:block;
+  width:24px;
+  height:2px;
+  background:var(--dark);
+  border-radius:2px;
+  transition:all .3s;
+}
+.burger.open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+.burger.open span:nth-child(2){ opacity:0; }
+.burger.open span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+@media(max-width:768px){
+  .burger{ display:flex; }
+  .nav-links{
+    display:none;
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background:rgba(253,246,238,.98);
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:32px;
+    z-index:150;
+  }
+  .nav-links.open{ display:flex; }
+  .nav-links a{ font-size:20px; }
+}
+
 </style>
 </head>
 <body>
@@ -122,7 +164,9 @@ footer a:hover{ color:var(--cream); }
     <a href="index.html#sveshti">Соева свещ</a>
     <a href="about.html">За нас</a>
     <a href="contact.html" class="active">Контакти</a>
-  </div>
+    <button class="burger" id="burger" aria-label="Меню">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
 <div class="hero-section">
@@ -233,5 +277,21 @@ footer a:hover{ color:var(--cream); }
 </footer>
 
 </div>
+
+<script>
+const burger = document.getElementById('burger');
+const navLinks = document.querySelector('.nav-links');
+burger.addEventListener('click', function(){
+  burger.classList.toggle('open');
+  navLinks.classList.toggle('open');
+});
+navLinks.querySelectorAll('a').forEach(function(a){
+  a.addEventListener('click', function(){
+    burger.classList.remove('open');
+    navLinks.classList.remove('open');
+  });
+});
+</script>
+
 </body>
 </html>
