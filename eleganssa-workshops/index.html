@@ -196,28 +196,29 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
 
 
 /* ── Hamburger Menu ── */
-.burger{
-  display:none;
-  flex-direction:column;
-  justify-content:center;
-  gap:5px;
-  cursor:pointer;
-  padding:4px;
-  background:none;
-  border:none;
-  z-index:300;
+@media(max-width:768px){
+  #burgerBtn{ display:flex !important; }
+  #navLinks{
+    display:none;
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background:rgba(30,20,10,.97);
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:36px;
+    z-index:250;
+  }
+  #navLinks.open{ display:flex; }
+  #navLinks a{
+    font-size:22px;
+    color:#ffffff !important;
+    font-weight:700;
+    text-decoration:none;
+  }
 }
-.burger span{
-  display:block;
-  width:24px;
-  height:2px;
-  background:#ffffff;
-  border-radius:2px;
-  transition:all .3s;
-}
-.burger.open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
-.burger.open span:nth-child(2){ opacity:0; }
-.burger.open span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+
+
 
 @media(max-width:768px){
   .burger{ display:flex; }
@@ -247,15 +248,18 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
 
 <nav>
   <a class="logo" href="#">Eleganssa Studio</a>
-  <div class="nav-links">
+  <div class="nav-links" id="navLinks">
     <a href="#jesmonite">Jesmonite</a>
     <a href="#sveshti">Соева свещ</a>
     <a href="#schedule-jes">Записване Jesmonite</a>
     <a href="#schedule-can">Записване Свещ</a>
-    <a href="about.html" style="color:var(--gold);">За нас</a>
-    <a href="contact.html" style="color:var(--gold);">Контакти</a>
-    <button class="burger" id="burger" aria-label="Меню">
-    <span></span><span></span><span></span>
+    <a href="about.html">За нас</a>
+    <a href="contact.html">Контакти</a>
+  </div>
+  <button id="burgerBtn" onclick="toggleMenu()" style="display:none;flex-direction:column;justify-content:center;gap:5px;cursor:pointer;padding:8px;background:none;border:none;z-index:300;position:relative;">
+    <span style="display:block;width:26px;height:2px;background:#ffffff;border-radius:2px;margin:2px 0;"></span>
+    <span style="display:block;width:26px;height:2px;background:#ffffff;border-radius:2px;margin:2px 0;"></span>
+    <span style="display:block;width:26px;height:2px;background:#ffffff;border-radius:2px;margin:2px 0;"></span>
   </button>
 </nav>
 
@@ -501,16 +505,15 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
 
 
 <script>
-const burger = document.getElementById('burger');
-const navLinks = document.querySelector('.nav-links');
-burger.addEventListener('click', function(){
-  burger.classList.toggle('open');
-  navLinks.classList.toggle('open');
-});
-navLinks.querySelectorAll('a').forEach(function(a){
-  a.addEventListener('click', function(){
-    burger.classList.remove('open');
-    navLinks.classList.remove('open');
+function toggleMenu(){
+  var nav = document.getElementById('navLinks');
+  nav.classList.toggle('open');
+}
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('#navLinks a').forEach(function(a){
+    a.addEventListener('click', function(){
+      document.getElementById('navLinks').classList.remove('open');
+    });
   });
 });
 </script>
