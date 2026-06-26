@@ -225,15 +225,20 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
     display:none;
     position:fixed;
     top:0; left:0; right:0; bottom:0;
-    background:rgba(253,246,238,.98);
+    background:rgba(42,32,20,.98);
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    gap:32px;
-    z-index:150;
+    gap:36px;
+    z-index:250;
   }
   .nav-links.open{ display:flex; }
-  .nav-links a{ font-size:20px; }
+  .nav-links a{
+    font-size:22px;
+    color:#ffffff !important;
+    text-decoration:none;
+    font-weight:700;
+  }
 }
 
 </style>
@@ -249,8 +254,7 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
     <a href="#schedule-can">Записване Свещ</a>
     <a href="about.html" style="color:var(--gold);">За нас</a>
     <a href="contact.html" style="color:var(--gold);">Контакти</a>
-  </div>
-  <button class="burger" id="burger" aria-label="Меню">
+    <button class="burger" id="burger" aria-label="Меню">
     <span></span><span></span><span></span>
   </button>
 </nav>
