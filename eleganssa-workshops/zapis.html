@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1925358761457707');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1925358761457707&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Запазване на място | Eleganssa Studio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:ital@1&family=Lato:wght@400;700&display=swap');
+:root{
+  --bg:#f5efe8; --dark:#2c3e50; --accent-jes:#3A5068; --accent-can:#9a543d;
+  --gold:#c8a86b; --cream:#fdf6ee; --muted:#6a7a8a; --border:#e8e0d8; --card:#ffffff;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ background:var(--bg); color:var(--dark); font-family:Lato,sans-serif; }
+
+nav{ position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(253,246,238,.96); backdrop-filter:blur(8px); padding:16px 40px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+.nav-logo{ font-family:"Playfair Display",serif; font-size:20px; color:var(--dark); text-decoration:none; }
+.nav-back{ color:var(--muted); text-decoration:none; font-size:14px; font-weight:700; }
+.nav-back:hover{ color:var(--dark); }
+
+.page{ padding-top:100px; padding-bottom:60px; max-width:640px; margin:auto; padding-left:24px; padding-right:24px; }
+
+.workshop-header{
+  text-align:center; margin-bottom:36px;
+}
+.workshop-badge{
+  display:inline-block; color:var(--cream); font-weight:700;
+  font-size:12px; letter-spacing:2px; padding:7px 18px; border-radius:20px; margin-bottom:14px;
+}
+.workshop-header h1{
+  font-family:"Playfair Display",serif;
+  font-size:36px; color:var(--dark); margin-bottom:8px;
+}
+.workshop-header .date{
+  font-family:Lora,serif; font-style:italic;
+  font-size:20px; color:var(--muted);
+}
+.workshop-header .details{
+  font-size:14px; color:var(--muted); margin-top:10px; line-height:1.6;
+}
+
+.step-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:32px;
+  margin-bottom:24px;
+}
+.step-num{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:50%;
+  background:var(--dark); color:var(--cream);
+  font-weight:700; font-size:14px; margin-right:10px;
+}
+.step-card h2{
+  font-family:"Playfair Display",serif;
+  font-size:21px; color:var(--dark); margin-bottom:20px;
+  display:flex; align-items:center;
+}
+
+.form-group{ margin-bottom:18px; }
+.form-group label{ display:block; font-size:13px; font-weight:700; color:var(--dark); margin-bottom:6px; }
+.form-group input{
+  width:100%; padding:13px 16px;
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:10px; font-size:15px; color:var(--dark);
+  font-family:Lato,sans-serif; outline:none;
+}
+.form-group input:focus{ border-color:var(--dark); }
+
+.consent-row{
+  display:flex; gap:10px; align-items:flex-start;
+  font-size:13px; color:var(--muted); line-height:1.5;
+  margin-bottom:20px;
+}
+.consent-row input{ margin-top:3px; }
+.consent-row a{ color:var(--accent-jes); }
+
+.submit-btn{
+  display:block; width:100%;
+  background:var(--dark); color:var(--cream);
+  font-family:Lato,sans-serif; font-weight:700; font-size:15px;
+  padding:15px; border:none; border-radius:12px; cursor:pointer;
+}
+.submit-btn:disabled{ opacity:.5; cursor:not-allowed; }
+.form-success{
+  display:none;
+  background:#e8f5e9; border:1px solid #a5d6a7;
+  color:#2e7d32; padding:14px; border-radius:10px;
+  font-size:14px; margin-top:14px; text-align:center;
+}
+
+.pay-btn{
+  display:block; width:100%;
+  background:var(--gold); color:#fff;
+  font-weight:700; font-size:16px;
+  padding:16px; border-radius:12px;
+  text-decoration:none; text-align:center;
+  margin-bottom:14px;
+}
+.pay-note{ font-size:12px; color:var(--muted); text-align:center; line-height:1.6; }
+
+.bank-details{
+  background:var(--bg); border-radius:12px;
+  padding:20px; font-size:14px; line-height:1.9; color:var(--dark);
+  margin-top:16px;
+}
+.bank-details b{ display:block; margin-bottom:6px; }
+
+.divider-or{
+  display:flex; align-items:center; gap:14px;
+  margin:22px 0; color:var(--muted); font-size:13px;
+}
+.divider-or::before,.divider-or::after{
+  content:''; flex:1; height:1px; background:var(--border);
+}
+
+.help-box{
+  text-align:center; font-size:14px; color:var(--muted);
+  margin-top:8px; line-height:1.7;
+}
+.help-box a{ color:var(--dark); font-weight:700; text-decoration:none; }
+
+footer{ background:var(--dark); color:var(--cream); padding:24px; text-align:center; font-size:13px; margin-top:40px; }
+footer a{ color:rgba(253,246,238,.6); text-decoration:none; margin:0 8px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">Eleganssa Studio</a>
+  <a class="nav-back" href="index.html">← Обратно към сайта</a>
+</nav>
+
+<div class="page">
+
+  <!-- WORKSHOP HEADER (динамично от URL) -->
+  <div class="workshop-header">
+    <span class="workshop-badge" id="wsBadge">РАБОТИЛНИЦА</span>
+    <h1 id="wsName">Записване</h1>
+    <div class="date" id="wsDate"></div>
+    <div class="details">Варна, ул. Бреза 2 | Продължителност: ~2 часа | Максимум 6 участника</div>
+  </div>
+
+  <!-- СТЪПКА 1: ФОРМА -->
+  <div class="step-card">
+    <h2><span class="step-num">1</span>Твоите данни</h2>
+    <form id="regForm" action="https://formspree.io/f/ТВОЯ_FORM_ID" method="POST">
+      <div class="form-group">
+        <label>Име и Фамилия *</label>
+        <input type="text" name="name" required placeholder="Иван Иванов">
+      </div>
+      <div class="form-group">
+        <label>Телефон *</label>
+        <input type="tel" name="phone" required placeholder="088...">
+      </div>
+      <div class="form-group">
+        <label>Имейл *</label>
+        <input type="email" name="email" required placeholder="ivan@example.com">
+      </div>
+      <input type="hidden" name="workshop" id="wsHidden">
+      <div class="consent-row">
+        <input type="checkbox" required id="gdprCheck">
+        <span>Съгласен/на съм личните ми данни да бъдат обработени за целите на записването, съгласно <a href="privacy.html" target="_blank">Политиката за поверителност</a>.</span>
+      </div>
+      <button type="submit" class="submit-btn">Изпрати данните</button>
+      <div class="form-success" id="formSuccess">✓ Данните са изпратени! Продължи с плащането на капарото по-долу.</div>
+    </form>
+  </div>
+
+  <!-- СТЪПКА 2: ПЛАЩАНЕ -->
+  <div class="step-card">
+    <h2><span class="step-num">2</span>Плати капаро 20 €</h2>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.7;">
+      Мястото ти е запазено след плащане на капарото. Остатъкът от 19 € се заплаща на място в деня на работилницата.
+    </p>
+
+    <a class="pay-btn" id="payBtn" href="#" onclick="trackPay()">Плати с карта — 20 €</a>
+    <p class="pay-note">Сигурно плащане през myPOS. Ще бъдеш пренасочен/а към защитена страница.</p>
+
+    <div class="divider-or">или</div>
+
+    <div class="bank-details">
+      <b>Банков превод:</b>
+      Титуляр: [Име на титуляра]<br>
+      IBAN: [BGXX XXXX XXXX XXXX XXXX XX]<br>
+      Банка: [Име на банката]<br>
+      Основание: Капаро + твоето име + датата на работилницата
+    </div>
+  </div>
+
+  <!-- ПОМОЩ -->
+  <div class="help-box">
+    При необходимост от съдействие:<br>
+    <a href="tel:+359885442821">📞 0885 442 821</a>
+  </div>
+
+</div>
+
+<footer>
+  © 2025 Eleganssa Studio — ЕЛЕГАНСА ЕООД |
+  <a href="privacy.html">Политика за поверителност</a> |
+  <a href="terms.html">Общи условия</a>
+</footer>
+
+<script>
+// ── Конфигурация на работилниците ──
+var WORKSHOPS = {
+  'jesmonite-5juli': {
+    name: 'Jesmonite декор',
+    date: '5 юли | 17:00',
+    badge: 'РАБОТИЛНИЦА 01',
+    badgeColor: '#3A5068',
+    payLink: 'https://mypos.com/vmp/btn/BW5EK5SEQ8725'
+  },
+  'jesmonite-11juli': {
+    name: 'Jesmonite декор',
+    date: '11 юли | 17:00',
+    badge: 'РАБОТИЛНИЦА 01',
+    badgeColor: '#3A5068',
+    payLink: 'https://mypos.com/vmp/btn/BFJYGPG6SER81'
+  },
+  'svesht-4juli': {
+    name: 'Соева свещ',
+    date: '4 юли | 17:00',
+    badge: 'РАБОТИЛНИЦА 02',
+    badgeColor: '#9a543d',
+    payLink: 'https://mypos.com/vmp/btn/BUWNB9NKXEW54'
+  },
+  'svesht-12juli': {
+    name: 'Соева свещ',
+    date: '12 юли | 17:00',
+    badge: 'РАБОТИЛНИЦА 02',
+    badgeColor: '#9a543d',
+    payLink: 'https://mypos.com/vmp/btn/BVN7KCXHMFX68'
+  }
+};
+
+// ── Прочети параметъра от URL ──
+var params = new URLSearchParams(window.location.search);
+var wsKey = params.get('workshop');
+var ws = WORKSHOPS[wsKey];
+
+if (ws) {
+  document.getElementById('wsBadge').textContent = ws.badge;
+  document.getElementById('wsBadge').style.background = ws.badgeColor;
+  document.getElementById('wsName').textContent = ws.name;
+  document.getElementById('wsDate').textContent = ws.date;
+  document.getElementById('wsHidden').value = ws.name + ' — ' + ws.date;
+  document.getElementById('payBtn').href = ws.payLink;
+  document.title = 'Запазване: ' + ws.name + ' ' + ws.date + ' | Eleganssa Studio';
+
+  // ViewContent event
+  fbq('track', 'ViewContent', {
+    content_name: ws.name + ' — ' + ws.date,
+    content_category: 'Workshop',
+    content_type: 'product',
+    value: 20.00,
+    currency: 'EUR'
+  });
+} else {
+  document.getElementById('wsBadge').style.background = '#2c3e50';
+  document.getElementById('wsName').textContent = 'Работилница не е избрана';
+  document.getElementById('wsDate').innerHTML = '<a href="index.html#schedule-jes" style="color:#3A5068;">← Избери работилница от сайта</a>';
+}
+
+// ── InitiateCheckout при клик на плащане ──
+function trackPay(){
+  if (ws) {
+    fbq('track', 'InitiateCheckout', {
+      content_name: ws.name + ' — ' + ws.date,
+      content_category: 'Workshop',
+      content_type: 'product',
+      value: 20.00,
+      currency: 'EUR',
+      num_items: 1
+    });
+  }
+}
+
+// ── Formspree AJAX submit (без redirect) ──
+document.getElementById('regForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var form = e.target;
+  var btn = form.querySelector('.submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Изпращане...';
+
+  fetch(form.action, {
+    method: 'POST',
+    body: new FormData(form),
+    headers: { 'Accept': 'application/json' }
+  }).then(function(response){
+    if (response.ok) {
+      document.getElementById('formSuccess').style.display = 'block';
+      btn.textContent = '✓ Изпратено';
+      fbq('track', 'Lead', {
+        content_name: ws ? ws.name + ' — ' + ws.date : 'Записване',
+        content_category: 'Workshop'
+      });
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Изпрати данните';
+      alert('Възникна грешка. Опитай отново или ни се обади на 0885 442 821.');
+    }
+  }).catch(function(){
+    btn.disabled = false;
+    btn.textContent = 'Изпрати данните';
+    alert('Възникна грешка. Опитай отново или ни се обади на 0885 442 821.');
+  });
+});
+</script>
+
+</body>
+</html>
