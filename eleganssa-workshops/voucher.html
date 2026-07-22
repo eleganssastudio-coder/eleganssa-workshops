@@ -116,15 +116,6 @@ nav{ position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(253,24
   font-size:14px; margin-top:14px; text-align:center;
 }
 
-.step-locked{ position:relative; }
-.step-locked .step-inner{ filter:blur(4px); opacity:.4; pointer-events:none; user-select:none; }
-.lock-overlay{
-  position:absolute; inset:0;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  text-align:center; padding:20px; z-index:5;
-}
-.lock-overlay svg{ width:32px; height:32px; stroke:var(--muted); fill:none; stroke-width:1.5; margin-bottom:10px; }
-.lock-overlay p{ font-size:14px; color:var(--muted); font-weight:700; max-width:260px; line-height:1.6; }
 
 .pay-btn{
   display:block; width:100%;
@@ -201,12 +192,8 @@ footer a{ color:rgba(253,246,238,.6); text-decoration:none; margin:0 8px; }
   </div>
 
   <!-- СТЪПКА 2: ПЛАЩАНЕ -->
-  <div class="step-card step-locked" id="step2Card">
-    <div class="lock-overlay" id="lockOverlay">
-      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <p>Попълни и изпрати данните си горе, за да отключиш плащането</p>
-    </div>
-    <div class="step-inner" id="step2Inner">
+  <div class="step-card" id="step2Card">
+    <div id="step2Inner">
       <h2><span class="step-num">2</span>Плати 39 €</h2>
       <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.7;">
         Ваучерът ще получиш на посочения имейл в рамките на 24 часа след плащането.
@@ -263,11 +250,6 @@ document.getElementById('voucherForm').addEventListener('submit', function(e){
     if (response.ok) {
       document.getElementById('formSuccess').style.display = 'block';
       btn.textContent = '✓ Изпратено';
-
-      var step2 = document.getElementById('step2Card');
-      step2.classList.remove('step-locked');
-      document.getElementById('lockOverlay').style.display = 'none';
-      step2.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
       fbq('track', 'Lead', { content_name: 'Подаръчен ваучер', content_category: 'Voucher' });
     } else {
