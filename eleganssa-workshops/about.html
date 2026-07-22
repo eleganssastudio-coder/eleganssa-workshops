@@ -208,45 +208,55 @@ footer{
   opacity:.9;
 }
 
-/* ── Hamburger Menu ── */
-.burger{
+
+
+/* ── Mobile Menu ── */
+#mobileMenuBtn{
   display:none;
   flex-direction:column;
-  justify-content:center;
-  gap:5px;
+  gap:6px;
   cursor:pointer;
-  padding:4px;
+  padding:6px;
   background:none;
   border:none;
-  z-index:200;
 }
-.burger span{
+#mobileMenuBtn span{
   display:block;
-  width:24px;
+  width:25px;
   height:2px;
-  background:var(--dark);
+  background:#2c3e50;
   border-radius:2px;
-  transition:all .3s;
 }
-.burger.open span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
-.burger.open span:nth-child(2){ opacity:0; }
-.burger.open span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
-
+#mobileOverlay{
+  display:none;
+  position:fixed;
+  top:0; left:0; right:0; bottom:0;
+  background:#1e1408;
+  z-index:500;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:40px;
+}
+#mobileOverlay a{
+  font-size:24px;
+  color:#ffffff;
+  text-decoration:none;
+  font-weight:700;
+  font-family:"Playfair Display",serif;
+}
+#mobileCloseBtn{
+  position:absolute;
+  top:20px; right:20px;
+  font-size:30px;
+  color:#ffffff;
+  background:none;
+  border:none;
+  cursor:pointer;
+}
 @media(max-width:768px){
-  .burger{ display:flex; }
-  .nav-links{
-    display:none;
-    position:fixed;
-    top:0; left:0; right:0; bottom:0;
-    background:rgba(253,246,238,.98);
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:32px;
-    z-index:150;
-  }
-  .nav-links.open{ display:flex; }
-  .nav-links a{ font-size:20px; }
+  #mobileMenuBtn{ display:flex; }
+  .nav-links{ display:none !important; }
 }
 
 </style>
@@ -261,11 +271,25 @@ footer{
     <a href="index.html#jesmonite">Jesmonite</a>
     <a href="index.html#sveshti">Соева свещ</a>
     <a href="index.html#schedule-jes">Записване</a>
+    <a href="voucher.html">Ваучер</a>
     <a href="about.html" class="active">За нас</a>
-    <button class="burger" id="burger" aria-label="Меню">
+    <a href="contact.html">Контакти</a>
+  </div>
+  <button id="mobileMenuBtn" onclick="document.getElementById('mobileOverlay').style.display='flex'" aria-label="Меню">
     <span></span><span></span><span></span>
   </button>
 </nav>
+
+<!-- Mobile Menu Overlay -->
+<div id="mobileOverlay">
+  <button id="mobileCloseBtn" onclick="document.getElementById('mobileOverlay').style.display='none'">✕</button>
+  <a href="index.html#jesmonite" onclick="document.getElementById('mobileOverlay').style.display='none'">Jesmonite</a>
+  <a href="index.html#sveshti" onclick="document.getElementById('mobileOverlay').style.display='none'">Соева свещ</a>
+  <a href="index.html#schedule-jes" onclick="document.getElementById('mobileOverlay').style.display='none'">Записване</a>
+  <a href="voucher.html" onclick="document.getElementById('mobileOverlay').style.display='none'">Ваучер</a>
+  <a href="about.html" onclick="document.getElementById('mobileOverlay').style.display='none'">За нас</a>
+  <a href="contact.html" onclick="document.getElementById('mobileOverlay').style.display='none'">Контакти</a>
+</div>
 
 <!-- HERO -->
 <div class="hero-section">

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1925358761457707');
+fbq('track', 'PageView');
+fbq('track', 'ViewContent', { content_name: 'Подаръчен ваучер', content_category: 'Voucher', value: 39.00, currency: 'EUR' });
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1925358761457707&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Подаръчен ваучер | Eleganssa Studio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:ital@1&family=Lato:wght@400;700&display=swap');
+:root{
+  --bg:#f5efe8; --dark:#2c3e50; --accent-jes:#3A5068; --accent-can:#9a543d;
+  --gold:#c8a86b; --cream:#fdf6ee; --muted:#6a7a8a; --border:#e8e0d8; --card:#ffffff;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ background:var(--bg); color:var(--dark); font-family:Lato,sans-serif; }
+
+nav{ position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(253,246,238,.96); backdrop-filter:blur(8px); padding:16px 40px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+.nav-logo{ font-family:"Playfair Display",serif; font-size:20px; color:var(--dark); text-decoration:none; }
+.nav-back{ color:var(--muted); text-decoration:none; font-size:14px; font-weight:700; }
+.nav-back:hover{ color:var(--dark); }
+
+.page{ padding-top:100px; padding-bottom:60px; max-width:640px; margin:auto; padding-left:24px; padding-right:24px; }
+
+.hero-header{ text-align:center; margin-bottom:36px; }
+.hero-badge{
+  display:inline-block; background:var(--gold); color:#fff; font-weight:700;
+  font-size:12px; letter-spacing:2px; padding:7px 18px; border-radius:20px; margin-bottom:14px;
+}
+.hero-header h1{
+  font-family:"Playfair Display",serif;
+  font-size:36px; color:var(--dark); margin-bottom:10px;
+}
+.hero-header p{
+  font-family:Lora,serif; font-style:italic;
+  font-size:17px; color:var(--muted); line-height:1.6;
+}
+
+.voucher-preview{
+  background:linear-gradient(135deg, var(--dark) 0%, #3A5068 100%);
+  border-radius:18px; padding:32px; margin-bottom:28px;
+  text-align:center; color:var(--cream);
+  border:2px dashed var(--gold);
+}
+.voucher-preview .vp-label{ font-size:12px; letter-spacing:2px; color:var(--gold); font-weight:700; margin-bottom:10px; }
+.voucher-preview h2{ font-family:"Playfair Display",serif; font-size:24px; margin-bottom:8px; }
+.voucher-preview .vp-price{ font-family:"Playfair Display",serif; font-size:38px; color:var(--gold); margin:10px 0; }
+.voucher-preview .vp-note{ font-size:13px; opacity:.8; }
+
+.step-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:32px;
+  margin-bottom:24px;
+}
+.step-num{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:50%;
+  background:var(--dark); color:var(--cream);
+  font-weight:700; font-size:14px; margin-right:10px;
+}
+.step-card h2{
+  font-family:"Playfair Display",serif;
+  font-size:21px; color:var(--dark); margin-bottom:20px;
+  display:flex; align-items:center;
+}
+
+.form-group{ margin-bottom:18px; }
+.form-group label{ display:block; font-size:13px; font-weight:700; color:var(--dark); margin-bottom:6px; }
+.form-group input, .form-group textarea{
+  width:100%; padding:13px 16px;
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:10px; font-size:15px; color:var(--dark);
+  font-family:Lato,sans-serif; outline:none;
+}
+.form-group textarea{ min-height:80px; resize:vertical; }
+.form-group input:focus, .form-group textarea:focus{ border-color:var(--dark); }
+.form-group .optional{ color:var(--muted); font-weight:400; }
+
+.consent-row{
+  display:flex; gap:10px; align-items:flex-start;
+  font-size:13px; color:var(--muted); line-height:1.5;
+  margin-bottom:20px;
+}
+.consent-row input{ margin-top:3px; }
+.consent-row a{ color:var(--accent-jes); }
+
+.submit-btn{
+  display:block; width:100%;
+  background:var(--dark); color:var(--cream);
+  font-family:Lato,sans-serif; font-weight:700; font-size:15px;
+  padding:15px; border:none; border-radius:12px; cursor:pointer;
+}
+.submit-btn:disabled{ opacity:.5; cursor:not-allowed; }
+.form-success{
+  display:none;
+  background:#e8f5e9; border:1px solid #a5d6a7;
+  color:#2e7d32; padding:14px; border-radius:10px;
+  font-size:14px; margin-top:14px; text-align:center;
+}
+
+.step-locked{ position:relative; }
+.step-locked .step-inner{ filter:blur(4px); opacity:.4; pointer-events:none; user-select:none; }
+.lock-overlay{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:20px; z-index:5;
+}
+.lock-overlay svg{ width:32px; height:32px; stroke:var(--muted); fill:none; stroke-width:1.5; margin-bottom:10px; }
+.lock-overlay p{ font-size:14px; color:var(--muted); font-weight:700; max-width:260px; line-height:1.6; }
+
+.pay-btn{
+  display:block; width:100%;
+  background:var(--gold); color:#fff;
+  font-weight:700; font-size:16px;
+  padding:16px; border-radius:12px;
+  text-decoration:none; text-align:center;
+  margin-bottom:14px;
+}
+.pay-note{ font-size:12px; color:var(--muted); text-align:center; line-height:1.6; }
+
+.info-box{
+  background:var(--bg); border-radius:12px; padding:18px 20px;
+  font-size:13px; color:var(--muted); line-height:1.8; margin-top:16px;
+}
+
+.help-box{ text-align:center; font-size:14px; color:var(--muted); margin-top:8px; line-height:1.7; }
+.help-box a{ color:var(--dark); font-weight:700; text-decoration:none; }
+
+footer{ background:var(--dark); color:var(--cream); padding:24px; text-align:center; font-size:13px; margin-top:40px; }
+footer a{ color:rgba(253,246,238,.6); text-decoration:none; margin:0 8px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">Eleganssa Studio</a>
+  <a class="nav-back" href="index.html">← Обратно към сайта</a>
+</nav>
+
+<div class="page">
+
+  <div class="hero-header">
+    <span class="hero-badge">ПОДАРЪЧЕН ВАУЧЕР</span>
+    <h1>Подари преживяване</h1>
+    <p>Ваучер за работилница по Jesmonite декор или Соева свещ — получателят избира сам коя и кога.</p>
+  </div>
+
+  <div class="voucher-preview">
+    <div class="vp-label">ELEGANSSA STUDIO</div>
+    <h2>Подаръчен ваучер</h2>
+    <div class="vp-price">39 €</div>
+    <div class="vp-note">Валиден 6 месеца · За Jesmonite декор или Соева свещ</div>
+  </div>
+
+  <!-- СТЪПКА 1: ФОРМА -->
+  <div class="step-card">
+    <h2><span class="step-num">1</span>Данни за ваучера</h2>
+    <form id="voucherForm" action="https://formspree.io/f/mpqgnbbd" method="POST">
+      <div class="form-group">
+        <label>Твоето име *</label>
+        <input type="text" name="buyer_name" required placeholder="Иван Иванов">
+      </div>
+      <div class="form-group">
+        <label>Твоят имейл *</label>
+        <input type="email" name="buyer_email" required placeholder="ivan@example.com">
+      </div>
+      <div class="form-group">
+        <label>Име на получателя <span class="optional">(по избор)</span></label>
+        <input type="text" name="recipient_name" placeholder="За кого е подаръкът">
+      </div>
+      <div class="form-group">
+        <label>Лично послание <span class="optional">(по избор)</span></label>
+        <textarea name="message" placeholder="Кратко послание, което да добавим към ваучера"></textarea>
+      </div>
+      <input type="hidden" name="order_type" value="Подаръчен ваучер — 39 €">
+      <div class="consent-row">
+        <input type="checkbox" required id="gdprCheck">
+        <span>Съгласен/на съм личните ми данни да бъдат обработени, съгласно <a href="privacy.html" target="_blank">Политиката за поверителност</a>.</span>
+      </div>
+      <button type="submit" class="submit-btn">Изпрати данните</button>
+      <div class="form-success" id="formSuccess">✓ Данните са изпратени! Продължи с плащането по-долу.</div>
+    </form>
+  </div>
+
+  <!-- СТЪПКА 2: ПЛАЩАНЕ -->
+  <div class="step-card step-locked" id="step2Card">
+    <div class="lock-overlay" id="lockOverlay">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <p>Попълни и изпрати данните си горе, за да отключиш плащането</p>
+    </div>
+    <div class="step-inner" id="step2Inner">
+      <h2><span class="step-num">2</span>Плати 39 €</h2>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.7;">
+        Ваучерът ще получиш на посочения имейл в рамките на 24 часа след плащането.
+      </p>
+      <a class="pay-btn" href="https://mypos.com/vmp/btn/BJN3VLLISN589" onclick="trackVoucherPay()">Плати с карта — 39 €</a>
+      <p class="pay-note">Сигурно плащане през myPOS. Ще бъдеш пренасочен/а към защитена страница.</p>
+
+      <div class="info-box">
+        <b>Как работи ваучерът:</b><br>
+        1. Плащаш и получаваш персонализиран PDF ваучер с уникален код на имейла си<br>
+        2. Подаряваш го на когото искаш<br>
+        3. Получателят избира дата от графика на сайта и вписва кода при записване вместо плащане на капаро
+      </div>
+    </div>
+  </div>
+
+  <div class="help-box">
+    При въпроси или съдействие:<br>
+    <a href="tel:+359885442821">📞 0885 442 821</a>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 Eleganssa Studio — ЕЛЕГАНСА ЕООД |
+  <a href="privacy.html">Политика за поверителност</a> |
+  <a href="terms.html">Общи условия</a>
+</footer>
+
+<script>
+function trackVoucherPay(){
+  fbq('track', 'InitiateCheckout', {
+    content_name: 'Подаръчен ваучер',
+    content_category: 'Voucher',
+    content_type: 'product',
+    value: 39.00,
+    currency: 'EUR',
+    num_items: 1
+  });
+}
+
+document.getElementById('voucherForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var form = e.target;
+  var btn = form.querySelector('.submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Изпращане...';
+
+  fetch(form.action, {
+    method: 'POST',
+    body: new FormData(form),
+    headers: { 'Accept': 'application/json' }
+  }).then(function(response){
+    if (response.ok) {
+      document.getElementById('formSuccess').style.display = 'block';
+      btn.textContent = '✓ Изпратено';
+
+      var step2 = document.getElementById('step2Card');
+      step2.classList.remove('step-locked');
+      document.getElementById('lockOverlay').style.display = 'none';
+      step2.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      fbq('track', 'Lead', { content_name: 'Подаръчен ваучер', content_category: 'Voucher' });
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Изпрати данните';
+      alert('Възникна грешка. Опитай отново или ни се обади на 0885 442 821.');
+    }
+  }).catch(function(){
+    btn.disabled = false;
+    btn.textContent = 'Изпрати данните';
+    alert('Възникна грешка. Опитай отново или ни се обади на 0885 442 821.');
+  });
+});
+</script>
+
+</body>
+</html>
