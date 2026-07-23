@@ -1,0 +1,256 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  orders        Order[]
+  bookings      Booking[]
+  wishlist      WishlistItem[]
+  addresses     Address[]
+  reviews       Review[]
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  products    Product[]
+}
+
+model Product {
+  id          String         @id @default(cuid())
+  name        String
+  slug        String         @unique
+  description String         @db.Text
+  price       Float
+  comparePrice Float?
+  images      String[]
+  ingredients String?        @db.Text
+  inStock     Boolean        @default(true)
+  featured    Boolean        @default(false)
+  categoryId  String
+  category    Category       @relation(fields: [categoryId], references: [id])
+  variants    ProductVariant[]
+  orderItems  OrderItem[]
+  wishlistItems WishlistItem[]
+  reviews     Review[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model ProductVariant {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  value     String
+  price     Float?
+  stock     Int      @default(0)
+}
+
+model Workshop {
+  id          String     @id @default(cuid())
+  title       String
+  slug        String     @unique
+  description String     @db.Text
+  shortDesc   String
+  image       String
+  price       Float
+  duration    String
+  maxSpots    Int
+  includes    String[]
+  steps       String[]
+  sessions    WorkshopSession[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model WorkshopSession {
+  id          String    @id @default(cuid())
+  workshopId  String
+  workshop    Workshop  @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+  date        DateTime
+  startTime   String
+  endTime     String
+  spotsLeft   Int
+  bookings    Booking[]
+}
+
+model Booking {
+  id               String          @id @default(cuid())
+  userId           String?
+  user             User?           @relation(fields: [userId], references: [id])
+  sessionId        String
+  session          WorkshopSession @relation(fields: [sessionId], references: [id])
+  spots            Int
+  totalPrice       Float
+  status           BookingStatus   @default(PENDING)
+  customerName     String
+  customerEmail    String
+  customerPhone    String
+  stripePaymentId  String?
+  ticketSent       Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  REFUNDED
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique @default(cuid())
+  userId          String?
+  user            User?       @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  subtotal        Float
+  shipping        Float       @default(0)
+  discount        Float       @default(0)
+  total           Float
+  status          OrderStatus @default(PENDING)
+  paymentMethod   String
+  stripePaymentId String?
+  promoCode       String?
+  shippingAddress Json
+  carrier         String?
+  trackingNumber  String?
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  name      String
+  price     Float
+  quantity  Int
+  variant   String?
+  image     String?
+}
+
+model WishlistItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@unique([userId, productId])
+}
+
+model Address {
+  id         String  @id @default(cuid())
+  userId     String
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  phone      String
+  street     String
+  city       String
+  postalCode String
+  isDefault  Boolean @default(false)
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  rating    Int
+  title     String
+  body      String   @db.Text
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model PromoCode {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  discount    Float
+  isPercent   Boolean  @default(true)
+  maxUses     Int?
+  usedCount   Int      @default(0)
+  expiresAt   DateTime?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model Newsletter {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}

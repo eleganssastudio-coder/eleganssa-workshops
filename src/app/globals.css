@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --navy: #2D3D4F;
+    --cream: #F5EDE3;
+    --sage: #5C6B4A;
+    --terracotta: #8B4A3C;
+    --light-cream: #FAF6F1;
+  }
+  body {
+    @apply bg-light-cream text-navy font-sans;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-navy text-cream px-6 py-3 font-sans text-sm tracking-widest uppercase hover:bg-sage transition-colors duration-300 inline-block;
+  }
+  .btn-outline {
+    @apply border border-navy text-navy px-6 py-3 font-sans text-sm tracking-widest uppercase hover:bg-navy hover:text-cream transition-colors duration-300 inline-block;
+  }
+  .btn-terracotta {
+    @apply bg-terracotta text-cream px-6 py-3 font-sans text-sm tracking-widest uppercase hover:opacity-90 transition-opacity duration-300 inline-block;
+  }
+  .section-title {
+    @apply font-serif text-3xl md:text-4xl text-navy mb-2;
+  }
+  .section-subtitle {
+    @apply text-sage text-sm tracking-widest uppercase mb-4;
+  }
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
