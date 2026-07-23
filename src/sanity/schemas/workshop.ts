@@ -29,7 +29,7 @@ export default defineType({
         ],
         preview: {
           select: { date: 'date', startTime: 'startTime', spotsLeft: 'spotsLeft' },
-          prepare({ date, startTime, spotsLeft }: { date: string; startTime: string; spotsLeft: number }) {
+          prepare({ date, startTime, spotsLeft }: { date?: string; startTime?: string; spotsLeft?: number }) {
             return { title: `${date} от ${startTime}`, subtitle: `${spotsLeft} места` }
           },
         },
