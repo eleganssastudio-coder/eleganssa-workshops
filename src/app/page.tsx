@@ -5,6 +5,8 @@ import { ArrowRight, Leaf, Sparkles, Heart } from 'lucide-react'
 import ProductCard from '@/components/ui/ProductCard'
 import WorkshopCard from '@/components/ui/WorkshopCard'
 import StarRating from '@/components/ui/StarRating'
+import { client } from '@/sanity/client'
+import { featuredProductsQuery, workshopsQuery, featuredReviewsQuery } from '@/sanity/queries'
 
 export const metadata: Metadata = {
   title: 'Начало',
@@ -12,7 +14,7 @@ export const metadata: Metadata = {
     'Eleganssa Studio - ателие за ръчно изработени соеви свещи и Jesmonite изделия. Твори. Миксирай. Създай.',
 }
 
-const featuredProducts = [
+const STATIC_PRODUCTS = [
   {
     id: '1',
     name: 'Соева свещ "Лавандула и ванилия"',
@@ -59,12 +61,12 @@ const featuredProducts = [
   },
 ]
 
-const workshops = [
+const STATIC_WORKSHOPS = [
   {
     id: '1',
     title: 'Работилница за соеви свещи',
     slug: 'rabotilnitsa-soevi-sveshti',
-    shortDesc: 'Научете изкуството на правенето на соеви свещи. Ще си тръгнете с две ръчно изработени свещи.',
+    shortDescription: 'Научете изкуството на правенето на соеви свещи. Ще си тръгнете с две ръчно изработени свещи.',
     image: 'https://images.unsplash.com/photo-1608181831718-2d4e2f0e5f31?w=800',
     price: 39,
     duration: '2.5 часа',
@@ -74,7 +76,7 @@ const workshops = [
     id: '2',
     title: 'Работилница за Jesmonite изделия',
     slug: 'rabotilnitsa-jesmonite',
-    shortDesc: 'Открийте магията на Jesmonite. Ще изработите декоративна купа или поднос.',
+    shortDescription: 'Открийте магията на Jesmonite. Ще изработите декоративна купа или поднос.',
     image: 'https://images.unsplash.com/photo-1615529328331-f8917597711f?w=800',
     price: 45,
     duration: '3 часа',
@@ -83,8 +85,8 @@ const workshops = [
   {
     id: '3',
     title: 'Комбинирана работилница',
-    slug: 'rabotilnitsa-soevi-sveshti',
-    shortDesc: 'Направете и свещ, и Jesmonite изделие в едно незабравимо следобедно събитие.',
+    slug: 'rabotilnitsa-kombinirana',
+    shortDescription: 'Направете и свещ, и Jesmonite изделие в едно незабравимо следобедно събитие.',
     image: 'https://images.unsplash.com/photo-1543854589-b3cc58d5f27e?w=800',
     price: 69,
     duration: '4 часа',
@@ -92,7 +94,7 @@ const workshops = [
   },
 ]
 
-const reviews = [
+const STATIC_REVIEWS = [
   {
     id: '1',
     author: 'Мария Д.',
@@ -137,7 +139,31 @@ const pillars = [
   },
 ]
 
-export default function HomePage() {
+export default async function HomePage() {
+  let featuredProducts: typeof STATIC_PRODUCTS = []
+  let workshops: typeof STATIC_WORKSHOPS = []
+  let reviews: typeof STATIC_REVIEWS = []
+
+  try {
+    if (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
+      featuredProducts = await client.fetch(featuredProductsQuery) || []
+      workshops = await client.fetch(workshopsQuery) || []
+      reviews = await client.fetch(featuredReviewsQuery) || []
+    }
+  } catch (e) {
+    // fallback to static data
+  }
+
+  if (!featuredProducts.length) {
+    featuredProducts = STATIC_PRODUCTS
+  }
+  if (!workshops.length) {
+    workshops = STATIC_WORKSHOPS
+  }
+  if (!reviews.length) {
+    reviews = STATIC_REVIEWS
+  }
+
   return (
     <>
       {/* Hero */}
@@ -206,8 +232,8 @@ export default function HomePage() {
             <div className="w-16 h-px bg-sage mx-auto mt-4" />
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {featuredProducts.map((product: any) => (
+              <ProductCard key={product._id || product.id} product={product} />
             ))}
           </div>
           <div className="text-center mt-12">
@@ -266,8 +292,8 @@ export default function HomePage() {
             <div className="w-16 h-px bg-sage mx-auto mt-4" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {workshops.map((workshop) => (
-              <WorkshopCard key={workshop.id} workshop={workshop} />
+            {workshops.map((workshop: any) => (
+              <WorkshopCard key={workshop._id || workshop.id} workshop={workshop} />
             ))}
           </div>
         </div>
@@ -282,8 +308,8 @@ export default function HomePage() {
             <div className="w-16 h-px bg-sage mx-auto mt-4" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {reviews.map((review) => (
-              <div key={review.id} className="bg-light-cream p-8">
+            {reviews.map((review: any) => (
+              <div key={review._id || review.id} className="bg-light-cream p-8">
                 <StarRating rating={review.rating} className="mb-4" />
                 <h4 className="font-serif text-lg text-navy mb-3">{review.title}</h4>
                 <p className="text-navy/60 font-sans text-sm leading-relaxed mb-6 italic">
