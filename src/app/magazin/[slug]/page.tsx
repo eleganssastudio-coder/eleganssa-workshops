@@ -22,10 +22,24 @@ export default async function ProductPage({ params }: { params: { slug: string }
     notFound()
   }
 
+  // Normalize to ensure required fields always exist
+  const normalized = {
+    ...product,
+    id: product._id || product.id || product.slug,
+    images: Array.isArray(product.images) ? product.images.filter(Boolean) : [],
+    variants: Array.isArray(product.variants) ? product.variants : [],
+    category: product.category || { name: '', slug: '' },
+  }
+
   const related = allProducts
     .filter((p: any) => (p._id || p.id) !== (product._id || product.id))
     .slice(0, 4)
-    .map((p: any) => ({ ...p, id: p._id || p.id || p.slug }))
+    .map((p: any) => ({
+      ...p,
+      id: p._id || p.id || p.slug,
+      images: Array.isArray(p.images) ? p.images.filter(Boolean) : [],
+      category: p.category || { name: '', slug: '' },
+    }))
 
-  return <ProductDetailClient product={product} relatedProducts={related} />
+  return <ProductDetailClient product={normalized} relatedProducts={related} />
 }
