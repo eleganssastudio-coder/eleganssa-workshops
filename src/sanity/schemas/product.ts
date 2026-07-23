@@ -9,8 +9,8 @@ export default defineType({
     defineField({ name: 'slug', title: 'Slug', type: 'slug', options: { source: 'name' }, validation: r => r.required() }),
     defineField({ name: 'description', title: 'Описание', type: 'array', of: [{ type: 'block' }] }),
     defineField({ name: 'shortDescription', title: 'Кратко описание', type: 'text', rows: 3 }),
-    defineField({ name: 'price', title: 'Основна цена (лв)', type: 'number', validation: r => r.required().positive() }),
-    defineField({ name: 'comparePrice', title: 'Стара цена (лв)', type: 'number' }),
+    defineField({ name: 'price', title: 'Основна цена (€)', type: 'number', validation: r => r.required().positive() }),
+    defineField({ name: 'comparePrice', title: 'Стара цена (€)', type: 'number' }),
     defineField({ name: 'images', title: 'Снимки', type: 'array', of: [{ type: 'image', options: { hotspot: true } }], validation: r => r.required().min(1) }),
     defineField({ name: 'category', title: 'Категория', type: 'reference', to: [{ type: 'category' }], validation: r => r.required() }),
     defineField({ name: 'ingredients', title: 'Съставки / Материали', type: 'text', rows: 4 }),
@@ -39,12 +39,12 @@ export default defineType({
               title: 'Опция',
               fields: [
                 { name: 'value', title: 'Стойност (напр. 100мл)', type: 'string', validation: (r: any) => r.required() },
-                { name: 'price', title: 'Цена (лв) — оставете празно за основна цена', type: 'number' },
+                { name: 'price', title: 'Цена (€) — оставете празно за основна цена', type: 'number' },
               ],
               preview: {
                 select: { title: 'value', subtitle: 'price' },
                 prepare({ title, subtitle }: { title?: string; subtitle?: number }) {
-                  return { title: title || '', subtitle: subtitle ? `${subtitle} лв` : 'основна цена' }
+                  return { title: title || '', subtitle: subtitle ? `${subtitle} €` : 'основна цена' }
                 },
               },
             }],
@@ -70,7 +70,7 @@ export default defineType({
   preview: {
     select: { title: 'name', media: 'images.0', price: 'price' },
     prepare({ title, media, price }: { title?: string; media?: any; price?: number }) {
-      return { title: title || '', media, subtitle: price ? `${price} лв` : '' }
+      return { title: title || '', media, subtitle: price ? `${price} €` : '' }
     },
   },
 })
