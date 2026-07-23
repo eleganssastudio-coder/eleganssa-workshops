@@ -146,13 +146,19 @@ export default function ProductDetailClient({
           {/* Images */}
           <div>
             <div className="relative aspect-square bg-cream overflow-hidden mb-4">
-              <Image
-                src={product.images[selectedImage]}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-              />
+              {product.images[selectedImage] ? (
+                <Image
+                  src={product.images[selectedImage]}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-navy/30 font-sans text-sm">
+                  Снимката предстои
+                </div>
+              )}
             </div>
             {product.images.length > 1 && (
               <div className="flex gap-3">
