@@ -432,7 +432,7 @@ function applyVoucher(){
   }
   document.getElementById('voucherHidden').value = code;
   alert('Кодът е записан. Ще проверим ваучера и ще потвърдим мястото ти лично на посочения телефон/имейл.');
-  fbq('track', 'Lead', {
+  fbq('trackCustom', 'VoucherRedemption', {
     content_name: (ws ? ws.name + ' — ' + ws.date : 'Записване') + ' (с ваучер)',
     content_category: 'Voucher Redemption'
   });
