@@ -2,6 +2,8 @@ import { client } from '@/sanity/client'
 import { productsQuery } from '@/sanity/queries'
 import MagazinClient from './MagazinClient'
 
+export const revalidate = 60
+
 const STATIC_PRODUCTS = [
   {
     _id: '1',
