@@ -116,6 +116,13 @@ export default async function MagazinPage() {
 
   if (!products.length) {
     products = STATIC_PRODUCTS
+  } else {
+    products = products.map((p: any) => ({
+      ...p,
+      id: p._id || p.id || p.slug,
+      images: Array.isArray(p.images) ? p.images.filter(Boolean) : [],
+      categorySlug: p.category?.slug || '',
+    }))
   }
 
   return <MagazinClient products={products} />
