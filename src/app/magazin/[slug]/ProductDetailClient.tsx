@@ -14,7 +14,7 @@ import toast from 'react-hot-toast'
 type Variant = { name: string; values: string[] }
 type RelatedProduct = {
   _id?: string
-  id?: string
+  id: string
   name: string
   slug: string
   price: number
