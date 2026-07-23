@@ -40,7 +40,13 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
   const includes = workshop.includes || []
   const steps = workshop.steps || []
   const session = selectedSession !== null ? sessions[selectedSession] : null
-  const description = workshop.description || workshop.shortDescription || ''
+  const toText = (v: any): string => {
+    if (!v) return ''
+    if (typeof v === 'string') return v
+    if (Array.isArray(v)) return v.map((b: any) => b.children?.map((c: any) => c.text || '').join('') || '').join('\n\n')
+    return ''
+  }
+  const description = toText(workshop.description) || toText(workshop.shortDescription)
 
   const handleBook = (e: React.FormEvent) => {
     e.preventDefault()

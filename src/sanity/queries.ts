@@ -11,7 +11,7 @@ export const productsQuery = groq`
     inStock,
     featured,
     "shortDescription": pt::text(shortDescription),
-    ingredients,
+    "ingredients": pt::text(ingredients),
     variants,
     category-> { name, "slug": slug.current }
   }
@@ -43,7 +43,7 @@ export const productBySlugQuery = groq`
     featured,
     "description": pt::text(description),
     "shortDescription": pt::text(shortDescription),
-    ingredients,
+    "ingredients": pt::text(ingredients),
     variants,
     category-> { name, "slug": slug.current }
   }
@@ -54,7 +54,7 @@ export const workshopsQuery = groq`
     _id,
     title,
     "slug": slug.current,
-    shortDescription,
+    "shortDescription": pt::text(shortDescription),
     "image": image.asset->url,
     price,
     duration,
@@ -70,8 +70,8 @@ export const workshopBySlugQuery = groq`
     _id,
     title,
     "slug": slug.current,
-    shortDescription,
-    description,
+    "shortDescription": pt::text(shortDescription),
+    "description": pt::text(description),
     "image": image.asset->url,
     price,
     duration,

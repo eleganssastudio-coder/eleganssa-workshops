@@ -104,7 +104,13 @@ export default function ProductDetailClient({
     toast.success(inWishlist ? 'Премахнато от любими' : 'Добавено в любими')
   }
 
-  const description = product.description || product.shortDescription || ''
+  const toText = (v: any): string => {
+    if (!v) return ''
+    if (typeof v === 'string') return v
+    if (Array.isArray(v)) return v.map((b: any) => b.children?.map((c: any) => c.text || '').join('') || '').join('\n\n')
+    return ''
+  }
+  const description = toText(product.description) || toText(product.shortDescription)
 
   return (
     <>
