@@ -6,7 +6,7 @@ import ProductCard from '@/components/ui/ProductCard'
 import WorkshopCard from '@/components/ui/WorkshopCard'
 import StarRating from '@/components/ui/StarRating'
 import { client } from '@/sanity/client'
-import { featuredProductsQuery, workshopsQuery, featuredReviewsQuery } from '@/sanity/queries'
+import { featuredProductsQuery, workshopsQuery, featuredReviewsQuery, homepageQuery } from '@/sanity/queries'
 
 export const metadata: Metadata = {
   title: 'Начало',
@@ -143,12 +143,14 @@ export default async function HomePage() {
   let featuredProducts: typeof STATIC_PRODUCTS = []
   let workshops: typeof STATIC_WORKSHOPS = []
   let reviews: typeof STATIC_REVIEWS = []
+  let homepage: { heroTitle?: string; heroSubtitle?: string; heroImage?: string } = {}
 
   try {
     if (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
       featuredProducts = await client.fetch(featuredProductsQuery) || []
       workshops = await client.fetch(workshopsQuery) || []
       reviews = await client.fetch(featuredReviewsQuery) || []
+      homepage = await client.fetch(homepageQuery) || {}
     }
   } catch (e) {
     // fallback to static data
@@ -170,7 +172,7 @@ export default async function HomePage() {
       <section className="relative h-[85vh] min-h-[600px] flex items-center">
         <div className="absolute inset-0">
           <Image
-            src="https://images.unsplash.com/photo-1608181831718-2d4e2f0e5f31?w=1600"
+            src={homepage.heroImage || "https://images.unsplash.com/photo-1608181831718-2d4e2f0e5f31?w=1600"}
             alt="Eleganssa Studio - ръчно изработени соеви свещи"
             fill
             className="object-cover"
@@ -184,12 +186,10 @@ export default async function HomePage() {
               Ателие за ръчна изработка · Варна
             </p>
             <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-cream leading-tight mb-6">
-              Твори.{' '}
-              <em>Миксирай.</em>{' '}
-              Създай.
+              {homepage.heroTitle || 'Твори. Миксирай. Създай.'}
             </h1>
             <p className="text-cream/80 font-sans text-lg mb-10 max-w-lg leading-relaxed">
-              Ръчно изработени соеви свещи, Jesmonite изделия и творчески работилници в сърцето на Варна.
+              {homepage.heroSubtitle || 'Ръчно изработени соеви свещи, Jesmonite изделия и творчески работилници в сърцето на Варна.'}
             </p>
             <div className="flex flex-wrap gap-4">
               <Link href="/magazin" className="btn-terracotta">
