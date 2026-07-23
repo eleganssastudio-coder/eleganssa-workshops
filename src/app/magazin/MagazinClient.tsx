@@ -7,9 +7,9 @@ import type { Product } from '@/components/ui/ProductCard'
 
 const categories = [
   { id: 'all', name: 'Всички' },
-  { id: 'soevi-sveshti', name: 'Соеви свещи' },
-  { id: 'jesmonite-izdeliya', name: 'Jesmonite изделия' },
+  { id: 'aromati-za-doma', name: 'Аромати за дома' },
   { id: 'komplekti', name: 'Комплекти' },
+  { id: 'dekor-za-doma-ot-jesmonite', name: 'Декор за дома от Jesmonite' },
 ]
 
 const sortOptions = [
