@@ -11,7 +11,8 @@ import StarRating from '@/components/ui/StarRating'
 import ProductCard from '@/components/ui/ProductCard'
 import toast from 'react-hot-toast'
 
-type Variant = { name: string; values: string[] }
+type VariantOption = { value: string; price?: number | null }
+type Variant = { type: string; options: VariantOption[] }
 type RelatedProduct = {
   _id?: string
   id: string
@@ -38,6 +39,17 @@ export type ProductDetail = {
   inStock: boolean
   variants?: Variant[]
   category: { name: string; slug: string }
+}
+
+function getSelectedPrice(basePrice: number, variants: Variant[], selected: Record<string, string>): number {
+  for (const variant of variants) {
+    const chosenValue = selected[variant.type]
+    if (chosenValue) {
+      const opt = variant.options.find(o => o.value === chosenValue)
+      if (opt?.price) return opt.price
+    }
+  }
+  return basePrice
 }
 
 const staticReviews = [
@@ -76,6 +88,8 @@ export default function ProductDetailClient({
 
   const productId = product._id || product.id || product.slug
   const inWishlist = isInWishlist(productId)
+  const variants = product.variants || []
+  const currentPrice = getSelectedPrice(product.price, variants, selectedVariants)
 
   const variantString = Object.entries(selectedVariants)
     .map(([k, v]) => `${k}: ${v}`)
@@ -85,7 +99,7 @@ export default function ProductDetailClient({
     addItem({
       id: productId,
       name: product.name,
-      price: product.price,
+      price: currentPrice,
       image: product.images[0],
       quantity,
       variant: variantString || undefined,
@@ -168,8 +182,8 @@ export default function ProductDetailClient({
             </div>
 
             <div className="flex items-baseline gap-3 mb-2">
-              <span className="font-serif text-3xl text-navy">{formatPrice(product.price)}</span>
-              {product.comparePrice && product.comparePrice > product.price && (
+              <span className="font-serif text-3xl text-navy">{formatPrice(currentPrice)}</span>
+              {product.comparePrice && product.comparePrice > currentPrice && (
                 <span className="font-sans text-gray-400 text-lg line-through">
                   {formatPrice(product.comparePrice)}
                 </span>
@@ -178,21 +192,21 @@ export default function ProductDetailClient({
             <p className="font-sans text-xs text-navy/50 mb-8">Цената включва ДДС</p>
 
             {/* Variants */}
-            {(product.variants || []).map((variant) => (
-              <div key={variant.name} className="mb-6">
-                <p className="font-sans text-sm font-medium text-navy mb-3">{variant.name}</p>
+            {variants.map((variant) => (
+              <div key={variant.type} className="mb-6">
+                <p className="font-sans text-sm font-medium text-navy mb-3">{variant.type}</p>
                 <div className="flex flex-wrap gap-2">
-                  {variant.values.map((value) => (
+                  {variant.options.map((opt) => (
                     <button
-                      key={value}
-                      onClick={() => setSelectedVariants((prev) => ({ ...prev, [variant.name]: value }))}
+                      key={opt.value}
+                      onClick={() => setSelectedVariants((prev) => ({ ...prev, [variant.type]: opt.value }))}
                       className={`px-4 py-2 border text-sm font-sans transition-colors ${
-                        selectedVariants[variant.name] === value
+                        selectedVariants[variant.type] === opt.value
                           ? 'border-navy bg-navy text-cream'
                           : 'border-navy/20 text-navy hover:border-navy'
                       }`}
                     >
-                      {value}
+                      {opt.value}{opt.price ? ` — ${formatPrice(opt.price)}` : ''}
                     </button>
                   ))}
                 </div>

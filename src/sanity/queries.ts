@@ -10,9 +10,12 @@ export const productsQuery = groq`
     "images": images[].asset->url,
     inStock,
     featured,
-    "shortDescription": pt::text(shortDescription),
-    "ingredients": pt::text(ingredients),
-    variants,
+    shortDescription,
+    ingredients,
+    variants[] {
+      type,
+      options[] { value, price }
+    },
     category-> { name, "slug": slug.current }
   }
 `
@@ -42,9 +45,12 @@ export const productBySlugQuery = groq`
     inStock,
     featured,
     "description": pt::text(description),
-    "shortDescription": pt::text(shortDescription),
-    "ingredients": pt::text(ingredients),
-    variants,
+    shortDescription,
+    ingredients,
+    variants[] {
+      type,
+      options[] { value, price }
+    },
     category-> { name, "slug": slug.current }
   }
 `
@@ -54,7 +60,7 @@ export const workshopsQuery = groq`
     _id,
     title,
     "slug": slug.current,
-    "shortDescription": pt::text(shortDescription),
+    shortDescription,
     "image": image.asset->url,
     price,
     duration,
@@ -70,7 +76,7 @@ export const workshopBySlugQuery = groq`
     _id,
     title,
     "slug": slug.current,
-    "shortDescription": pt::text(shortDescription),
+    shortDescription,
     "description": pt::text(description),
     "image": image.asset->url,
     price,
