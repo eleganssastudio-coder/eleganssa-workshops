@@ -160,6 +160,12 @@ export default async function HomePage() {
 
   if (!featuredProducts.length) {
     featuredProducts = STATIC_PRODUCTS
+  } else {
+    featuredProducts = featuredProducts.map((p: any) => ({
+      ...p,
+      id: p._id || p.id || p.slug,
+      images: Array.isArray(p.images) ? p.images.filter(Boolean) : [],
+    }))
   }
   if (!workshops.length) {
     workshops = STATIC_WORKSHOPS
