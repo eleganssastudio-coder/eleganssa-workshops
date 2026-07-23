@@ -139,6 +139,8 @@ const pillars = [
   },
 ]
 
+export const revalidate = 60
+
 export default async function HomePage() {
   let featuredProducts: typeof STATIC_PRODUCTS = []
   let workshops: typeof STATIC_WORKSHOPS = []
