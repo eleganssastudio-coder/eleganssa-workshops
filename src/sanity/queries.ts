@@ -10,7 +10,7 @@ export const productsQuery = groq`
     "images": images[].asset->url,
     inStock,
     featured,
-    shortDescription,
+    "shortDescription": pt::text(shortDescription),
     ingredients,
     variants,
     category-> { name, "slug": slug.current }
@@ -41,8 +41,8 @@ export const productBySlugQuery = groq`
     "images": images[].asset->url,
     inStock,
     featured,
-    description,
-    shortDescription,
+    "description": pt::text(description),
+    "shortDescription": pt::text(shortDescription),
     ingredients,
     variants,
     category-> { name, "slug": slug.current }
