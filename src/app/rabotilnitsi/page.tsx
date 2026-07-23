@@ -2,6 +2,10 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import WorkshopCard from '@/components/ui/WorkshopCard'
 import { CheckCircle } from 'lucide-react'
+import { client } from '@/sanity/client'
+import { workshopsQuery } from '@/sanity/queries'
+
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Работилници',
@@ -9,12 +13,12 @@ export const metadata: Metadata = {
     'Творчески работилници за соеви свещи и Jesmonite изделия в Eleganssa Studio, Варна. Запишете се онлайн.',
 }
 
-const workshops = [
+const STATIC_WORKSHOPS = [
   {
     id: '1',
     title: 'Работилница за соеви свещи',
     slug: 'rabotilnitsa-soevi-sveshti',
-    shortDesc: 'Научете изкуството на правенето на соеви свещи. Ще си тръгнете с две ръчно изработени свещи и знанието да правите свои собствени.',
+    shortDescription: 'Научете изкуството на правенето на соеви свещи. Ще си тръгнете с две ръчно изработени свещи и знанието да правите свои собствени.',
     image: 'https://images.unsplash.com/photo-1608181831718-2d4e2f0e5f31?w=800',
     price: 39,
     duration: '2.5 часа',
@@ -24,7 +28,7 @@ const workshops = [
     id: '2',
     title: 'Работилница за Jesmonite изделия',
     slug: 'rabotilnitsa-jesmonite',
-    shortDesc: 'Открийте магията на Jesmonite. Ще изработите декоративна купа или поднос с уникален ефект.',
+    shortDescription: 'Открийте магията на Jesmonite. Ще изработите декоративна купа или поднос с уникален ефект.',
     image: 'https://images.unsplash.com/photo-1615529328331-f8917597711f?w=800',
     price: 45,
     duration: '3 часа',
@@ -43,7 +47,21 @@ const benefits = [
   'Перфектно за корпоративни тийм билдинги',
 ]
 
-export default function RabotilnitsiPage() {
+export default async function RabotilnitsiPage() {
+  let workshops: any[] = []
+
+  try {
+    if (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
+      workshops = await client.fetch(workshopsQuery) || []
+    }
+  } catch (e) {
+    // fallback below
+  }
+
+  if (!workshops.length) {
+    workshops = STATIC_WORKSHOPS
+  }
+
   return (
     <>
       {/* Hero */}
@@ -77,8 +95,8 @@ export default function RabotilnitsiPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            {workshops.map((workshop) => (
-              <WorkshopCard key={workshop.id} workshop={workshop} />
+            {workshops.map((workshop: any) => (
+              <WorkshopCard key={workshop._id || workshop.id} workshop={workshop} />
             ))}
           </div>
         </div>
