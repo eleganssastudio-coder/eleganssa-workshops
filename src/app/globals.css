@@ -32,7 +32,7 @@
     @apply font-serif text-3xl md:text-4xl text-navy mb-2;
   }
   .section-subtitle {
-    @apply text-sage text-sm tracking-widest uppercase mb-4;
+    @apply text-navy/60 text-sm tracking-widest uppercase mb-4;
   }
   .container-custom {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
