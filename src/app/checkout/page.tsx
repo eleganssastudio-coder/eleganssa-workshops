@@ -121,8 +121,9 @@ export default function CheckoutPage() {
                 <p className="font-serif text-lg text-navy mb-3">Банков превод</p>
                 <p className="font-sans text-sm text-navy/70 mb-1">Моля, наредете <strong>{formatPrice(total)}</strong> по следните данни:</p>
                 <div className="font-sans text-sm text-navy/80 space-y-1 mt-3">
-                  <p><span className="text-navy/40">Получател:</span> Eleganssa Studio</p>
-                  <p><span className="text-navy/40">IBAN:</span> — <span className="text-navy/40 text-xs">(добавете в Sanity)</span></p>
+                  <p><span className="text-navy/40">Получател:</span> ELEGANSA EOOD</p>
+                  <p><span className="text-navy/40">IBAN:</span> BG17INTF40012092397597</p>
+                  <p><span className="text-navy/40">Банка:</span> iCard AD (INTFBGSF)</p>
                   <p><span className="text-navy/40">Основание:</span> Поръчка {orderNumber}</p>
                 </div>
                 <p className="font-sans text-xs text-navy/40 mt-3">Поръчката се обработва след получаване на плащането.</p>
