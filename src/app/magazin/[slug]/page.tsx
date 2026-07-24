@@ -26,8 +26,18 @@ export default async function ProductPage({ params }: { params: { slug: string }
   const normalized = {
     ...product,
     id: product._id || product.id || product.slug,
-    images: Array.isArray(product.images) ? product.images.filter(Boolean) : [],
-    variants: Array.isArray(product.variants) ? product.variants : [],
+    images: Array.isArray(product.images) ? product.images.filter((img: any) => typeof img === 'string') : [],
+    variants: Array.isArray(product.variants)
+      ? product.variants.map((v: any) => ({
+          ...v,
+          type: v.type || '',
+          options: Array.isArray(v.options)
+            ? v.options.map((o: any) =>
+                typeof o === 'string' ? { value: o } : { value: o.value || '', price: o.price ?? null }
+              )
+            : [],
+        }))
+      : [],
     category: product.category || { name: '', slug: '' },
   }
 

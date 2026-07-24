@@ -45,7 +45,8 @@ function getSelectedPrice(basePrice: number, variants: Variant[], selected: Reco
   for (const variant of variants) {
     const chosenValue = selected[variant.type]
     if (chosenValue) {
-      const opt = variant.options.find(o => o.value === chosenValue)
+      const opts = Array.isArray(variant.options) ? variant.options : []
+      const opt = opts.find(o => o.value === chosenValue)
       if (opt?.price) return opt.price
     }
   }
@@ -202,7 +203,7 @@ export default function ProductDetailClient({
               <div key={variant.type} className="mb-6">
                 <p className="font-sans text-sm font-medium text-navy mb-3">{variant.type}</p>
                 <div className="flex flex-wrap gap-2">
-                  {variant.options.map((opt) => (
+                  {(Array.isArray(variant.options) ? variant.options : []).map((opt) => (
                     <button
                       key={opt.value}
                       onClick={() => setSelectedVariants((prev) => ({ ...prev, [variant.type]: opt.value }))}
