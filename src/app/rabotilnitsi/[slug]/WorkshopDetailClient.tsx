@@ -21,7 +21,7 @@ export type WorkshopDetail = {
   duration: string
   maxSpots: number
   includes?: string[]
-  steps?: string[]
+  steps?: { text: string; image?: string }[]
   sessions?: Session[]
 }
 
@@ -157,14 +157,19 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
             {steps.length > 0 && (
               <div className="mb-12">
                 <h2 className="font-serif text-3xl text-navy mb-6">Програма</h2>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {steps.map((s, i) => (
                     <div key={i} className="flex gap-4">
                       <div className="flex-shrink-0 w-8 h-8 rounded-full bg-navy text-cream flex items-center justify-center font-serif text-sm">
                         {i + 1}
                       </div>
-                      <div className="flex-1 pt-1">
-                        <p className="font-sans text-navy/70">{s}</p>
+                      <div className="flex-1">
+                        <p className="font-sans text-navy/70 pt-1">{typeof s === 'string' ? s : s.text}</p>
+                        {typeof s !== 'string' && s.image && (
+                          <div className="relative mt-3 aspect-video overflow-hidden rounded">
+                            <Image src={s.image} alt={s.text} fill className="object-cover" />
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

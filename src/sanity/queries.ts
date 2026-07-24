@@ -93,7 +93,7 @@ export const workshopsQuery = groq`
     duration,
     maxSpots,
     includes,
-    steps,
+    steps[] { text, "image": image.asset->url },
     sessions
   }
 `
@@ -110,7 +110,7 @@ export const workshopBySlugQuery = groq`
     duration,
     maxSpots,
     includes,
-    steps,
+    steps[] { text, "image": image.asset->url },
     sessions
   }
 `
