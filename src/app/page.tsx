@@ -120,7 +120,7 @@ export default async function HomePage() {
 
       {/* Stats */}
       <section className="bg-navy py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-cream/10">
             {[
               { value: '200+', label: 'ИЗРАБОТЕНИ ИЗДЕЛИЯ' },
