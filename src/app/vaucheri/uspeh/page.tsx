@@ -13,6 +13,7 @@ function VoucherSuccessContent() {
   const recipientName = params.get('recipientName') || ''
   const recipientEmail = params.get('recipientEmail') || ''
   const senderEmail = params.get('senderEmail') || ''
+  const delivery = params.get('delivery') || 'digital'
   const [notified, setNotified] = useState(false)
 
   useEffect(() => {
@@ -37,6 +38,21 @@ function VoucherSuccessContent() {
           {recipientEmail && <p><span className="text-navy/40">Изпратен на:</span> {recipientEmail}</p>}
         </div>
       </div>
+
+      {delivery === 'atelier' && (
+        <div className="bg-cream p-5 text-left mb-6">
+          <p className="font-sans text-sm font-medium text-navy mb-1">Физическа картичка — от ателието</p>
+          <p className="font-sans text-sm text-navy/60">
+            Свържете се с нас на <strong>eleganssastudio@gmail.com</strong>, за да уговорим удобен ден и час за получаване.
+          </p>
+        </div>
+      )}
+      {delivery === 'boxnow' && (
+        <div className="bg-cream p-5 text-left mb-6">
+          <p className="font-sans text-sm font-medium text-navy mb-1">Физическа картичка — BoxNow</p>
+          <p className="font-sans text-sm text-navy/60">Ще изпратим картичката до посочения от вас BoxNow автомат.</p>
+        </div>
+      )}
 
       <p className="font-sans text-sm text-navy/60 mb-8">
         Копие е изпратено и на <strong>{senderEmail}</strong>.

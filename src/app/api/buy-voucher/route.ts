@@ -11,18 +11,25 @@ function generateCode() {
   return code
 }
 
+const WORKSHOP_PRICE = 39
+
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { voucherType, value, senderName, senderEmail, recipientName, recipientEmail, message } = body
+  const { voucherType, value, deliveryMethod, boxnowAddress, senderName, senderEmail, recipientName, recipientEmail, message } = body
 
   const code = generateCode()
   const origin = req.headers.get('origin')
 
+  const unitAmount = voucherType === 'workshop' ? WORKSHOP_PRICE * 100 : (value ?? 0) * 100
+  const resolvedValue = voucherType === 'workshop' ? WORKSHOP_PRICE : (value ?? 0)
+
+  const deliveryLabel = deliveryMethod === 'digital' ? 'Дигитален — по имейл'
+    : deliveryMethod === 'atelier' ? 'Физическа картичка — от ателието'
+    : `Физическа картичка — BoxNow: ${boxnowAddress || ''}`
+
   const productName = voucherType === 'workshop'
     ? 'Подаръчен ваучер за работилница — Eleganssa Studio'
-    : `Подаръчен ваучер ${value} € — Eleganssa Studio`
-
-  const unitAmount = voucherType === 'value' ? value * 100 : 5000 // 50€ default for workshop voucher
+    : `Подаръчен ваучер ${resolvedValue} € — Eleganssa Studio`
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
@@ -33,7 +40,7 @@ export async function POST(req: NextRequest) {
           currency: 'eur',
           product_data: {
             name: productName,
-            description: recipientName ? `За: ${recipientName}` : undefined,
+            description: `${deliveryLabel}${recipientName ? ` · За: ${recipientName}` : ''}`,
           },
           unit_amount: unitAmount,
         },
@@ -44,14 +51,16 @@ export async function POST(req: NextRequest) {
     metadata: {
       code,
       voucherType,
-      value: String(value ?? ''),
+      value: String(resolvedValue),
+      deliveryMethod: deliveryMethod || 'digital',
+      boxnowAddress: boxnowAddress || '',
       senderName,
       senderEmail,
       recipientName,
       recipientEmail,
       message: message || '',
     },
-    success_url: `${origin}/vaucheri/uspeh?code=${code}&type=${voucherType}&value=${value ?? ''}&recipientName=${encodeURIComponent(recipientName)}&recipientEmail=${encodeURIComponent(recipientEmail)}&senderEmail=${encodeURIComponent(senderEmail)}&session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${origin}/vaucheri/uspeh?code=${code}&type=${voucherType}&value=${resolvedValue}&recipientName=${encodeURIComponent(recipientName)}&recipientEmail=${encodeURIComponent(recipientEmail)}&senderEmail=${encodeURIComponent(senderEmail)}&delivery=${deliveryMethod}&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/vaucheri`,
   })
 
@@ -87,6 +96,10 @@ export async function GET(req: NextRequest) {
       paidAt: new Date().toISOString(),
     })
 
+    const deliveryLabel = meta.deliveryMethod === 'digital' ? 'Дигитален — по имейл'
+      : meta.deliveryMethod === 'atelier' ? 'Физическа картичка — от ателието'
+      : `Физическа картичка — BoxNow: ${meta.boxnowAddress}`
+
     // Email to owner (Formspree)
     await fetch('https://formspree.io/f/mpqgnbbd', {
       method: 'POST',
@@ -95,6 +108,7 @@ export async function GET(req: NextRequest) {
         _subject: `Нов подаръчен ваучер — ${code}`,
         'Код на ваучера': code,
         'Тип': meta.voucherType === 'workshop' ? 'За работилница' : `На стойност ${meta.value} €`,
+        'Формат': deliveryLabel,
         'Подател': `${meta.senderName} (${meta.senderEmail})`,
         'Получател': `${meta.recipientName} (${meta.recipientEmail})`,
         'Послание': meta.message || '—',
