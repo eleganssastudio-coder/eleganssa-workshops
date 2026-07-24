@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Clock, Users, CheckCircle, ChevronRight, Calendar, Minus, Plus } from 'lucide-react'
+import { Clock, Users, CheckCircle, ChevronRight, Calendar, Minus, Plus, CreditCard, Banknote } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
@@ -35,7 +35,9 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
   const [spots, setSpots] = useState(1)
   const [step, setStep] = useState<'select' | 'book' | 'done'>('select')
   const [form, setForm] = useState({ name: '', email: '', phone: '' })
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank'>('card')
   const [bookingId, setBookingId] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const sessions = workshop.sessions || []
   const includes = workshop.includes || []
@@ -51,35 +53,43 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
 
   const handleBook = async (e: React.FormEvent) => {
     e.preventDefault()
-    const id = `WS-${Date.now().toString().slice(-6)}`
-    setBookingId(id)
-    const bookingId = id
+    setLoading(true)
     const sessionInfo = session
       ? `${formatDate(session.date)}, ${session.startTime}–${session.endTime}`
       : 'По договаряне'
 
     try {
-      await fetch('https://formspree.io/f/mpqgnbbd', {
+      const res = await fetch('/api/book-workshop', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          _subject: `Ново записване за работилница — ${bookingId}`,
-          'Номер на записването': bookingId,
-          'Работилница': workshop.title,
-          'Дата и час': sessionInfo,
-          'Брой участници': spots,
-          'Обща сума': `${workshop.price * spots} €`,
-          'Капаро': '20 €',
-          'Остатък за плащане на място': `${workshop.price * spots - 20} €`,
-          'Имена': form.name,
-          'Имейл': form.email,
-          'Телефон': form.phone,
+          workshopId: workshop._id,
+          workshopTitle: workshop.title,
+          sessionIndex: selectedSession,
+          sessionInfo,
+          spots,
+          price: workshop.price,
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          paymentMethod,
         }),
       })
-    } catch (_) {}
+      const data = await res.json()
 
-    toast.success('Записването е изпратено! Ще получите потвърждение на имейла.')
-    setStep('done')
+      if (paymentMethod === 'card' && data.url) {
+        window.location.href = data.url
+        return
+      }
+
+      setBookingId(data.bookingId || '')
+      toast.success('Записването е изпратено! Ще получите потвърждение на имейла.')
+      setStep('done')
+    } catch (_) {
+      toast.error('Грешка. Моля, опитайте отново.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -288,8 +298,31 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
                       />
                     </div>
                   </div>
-                  <button type="submit" className="btn-primary w-full text-center mb-3">
-                    Потвърди записването
+                  {/* Payment method */}
+                  <div className="mb-6">
+                    <p className="font-sans text-sm font-medium text-navy mb-3">Начин на плащане на капарото (20 €)</p>
+                    <div className="space-y-2">
+                      <button type="button" onClick={() => setPaymentMethod('card')}
+                        className={`w-full text-left p-4 border-2 flex items-center gap-3 transition-colors ${paymentMethod === 'card' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}>
+                        <CreditCard className={`w-4 h-4 flex-shrink-0 ${paymentMethod === 'card' ? 'text-navy' : 'text-navy/40'}`} />
+                        <div>
+                          <p className="font-sans text-sm font-medium text-navy">Плащане с карта</p>
+                          <p className="font-sans text-xs text-navy/50">Сигурно плащане чрез Stripe</p>
+                        </div>
+                      </button>
+                      <button type="button" onClick={() => setPaymentMethod('bank')}
+                        className={`w-full text-left p-4 border-2 flex items-center gap-3 transition-colors ${paymentMethod === 'bank' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}>
+                        <Banknote className={`w-4 h-4 flex-shrink-0 ${paymentMethod === 'bank' ? 'text-navy' : 'text-navy/40'}`} />
+                        <div>
+                          <p className="font-sans text-sm font-medium text-navy">Банков превод</p>
+                          <p className="font-sans text-xs text-navy/50">Ще получите банковите данни по имейл</p>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  <button type="submit" disabled={loading} className="btn-primary w-full text-center mb-3 disabled:opacity-50">
+                    {loading ? 'Обработка...' : paymentMethod === 'card' ? 'Плати капаро 20 € с карта' : 'Запази с банков превод'}
                   </button>
                   <button
                     type="button"
@@ -308,11 +341,20 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
                   {bookingId && (
                     <p className="font-sans text-xs text-navy/40 mb-2">Номер: {bookingId}</p>
                   )}
-                  <p className="font-sans text-sm text-navy/60 mb-2">
-                    Ще получите потвърждение на <strong>{form.email}</strong> до 24 часа.
+                  <p className="font-sans text-sm text-navy/60 mb-4">
+                    Потвърждение ще получите на <strong>{form.email}</strong>.
                   </p>
-                  <p className="font-sans text-sm text-navy/60 mb-6">
-                    Капаро: <strong>20 €</strong> — ще получите инструкции за плащане по имейл.
+                  <div className="bg-white p-4 text-left mb-4">
+                    <p className="font-sans text-sm font-medium text-navy mb-2">Банков превод — капаро 20 €</p>
+                    <div className="font-sans text-xs text-navy/70 space-y-1">
+                      <p><span className="text-navy/40">Получател:</span> ELEGANSA EOOD</p>
+                      <p><span className="text-navy/40">IBAN:</span> BG17INTF40012092397597</p>
+                      <p><span className="text-navy/40">Банка:</span> iCard AD</p>
+                      <p><span className="text-navy/40">Основание:</span> {bookingId}</p>
+                    </div>
+                  </div>
+                  <p className="font-sans text-xs text-navy/40 mb-6">
+                    Остатъкът от {formatPrice(workshop.price * spots - 20)} се заплаща на място.
                   </p>
                   <button
                     onClick={() => { setStep('select'); setSelectedSession(null); setSpots(1) }}
