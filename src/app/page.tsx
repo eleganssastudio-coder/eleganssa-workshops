@@ -118,6 +118,24 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Stats */}
+      <section className="bg-navy py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-cream/10">
+            {[
+              { value: '200+', label: 'ИЗРАБОТЕНИ ИЗДЕЛИЯ' },
+              { value: '50+', label: 'ПРОВЕДЕНИ РАБОТИЛНИЦИ' },
+              { value: '100%', label: 'ЕСТЕСТВЕНИ МАТЕРИАЛИ' },
+            ].map((stat) => (
+              <div key={stat.label} className="flex flex-col items-center py-8 sm:py-6 gap-2">
+                <span className="font-serif text-4xl md:text-5xl text-gold" style={{ color: '#C9A96E' }}>{stat.value}</span>
+                <span className="font-sans text-xs tracking-widest text-cream/50 uppercase">{stat.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* New Products Carousel */}
       <NewProductsCarousel products={newProducts} />
 
