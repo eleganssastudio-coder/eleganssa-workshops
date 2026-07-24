@@ -7,6 +7,9 @@ import { ChevronRight, CheckCircle, Banknote, Truck, Package } from 'lucide-reac
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
 import toast from 'react-hot-toast'
+import SearchableSelect from '@/components/ui/SearchableSelect'
+import { boxnowLocations } from '@/data/boxnow-locations'
+import { speedyOffices, speedyCities } from '@/data/speedy-offices'
 
 type Step = 'shipping' | 'payment' | 'done'
 type PaymentMethod = 'bank' | 'cod'
@@ -38,8 +41,10 @@ export default function CheckoutPage() {
   const [voucherChecking, setVoucherChecking] = useState(false)
   const [voucherMsg, setVoucherMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [deliveryType, setDeliveryType] = useState<DeliveryType>('boxnow')
+  const [boxnowId, setBoxnowId] = useState<string | null>(null)
   const [boxnowAddress, setBoxnowAddress] = useState('')
   const [speedyCity, setSpeedyCity] = useState('')
+  const [speedyOfficeId, setSpeedyOfficeId] = useState<string | null>(null)
   const [speedyOffice, setSpeedyOffice] = useState('')
   const [shippingData, setShippingData] = useState({
     firstName: '', lastName: '', email: '', phone: '',
@@ -65,6 +70,8 @@ export default function CheckoutPage() {
 
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (deliveryType === 'boxnow' && !boxnowId) { toast.error('Моля, изберете BoxNow автомат.'); return }
+    if (deliveryType === 'speedy' && !speedyOfficeId) { toast.error('Моля, изберете офис на Спиди.'); return }
     setCurrentStep('payment')
   }
 
@@ -244,14 +251,17 @@ export default function CheckoutPage() {
 
                   {deliveryType === 'boxnow' && (
                     <div className="mb-8">
-                      <label className="block font-sans text-sm text-navy mb-2">Адрес на BoxNow автомат *</label>
-                      <input required type="text" value={boxnowAddress}
-                        onChange={(e) => setBoxnowAddress(e.target.value)}
-                        placeholder="напр. BoxNow — Mall of Sofia, ет. 0"
-                        className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy" />
+                      <label className="block font-sans text-sm text-navy mb-2">Изберете BoxNow автомат *</label>
+                      <SearchableSelect
+                        options={boxnowLocations.map((l) => ({ id: l.id, label: l.name, sublabel: `${l.address}, ${l.city}` }))}
+                        value={boxnowId}
+                        onChange={(id, label) => { setBoxnowId(id); const loc = boxnowLocations.find(l => l.id === id); setBoxnowAddress(loc ? `${loc.name} — ${loc.address}, ${loc.city}` : label) }}
+                        placeholder="Изберете автомат..."
+                        searchPlaceholder="Търсете по квартал, мол или адрес..."
+                      />
                       <p className="font-sans text-xs text-navy/40 mt-2">
-                        Намерете автомат на{' '}
-                        <a href="https://boxnow.bg/bg/locations" target="_blank" rel="noopener noreferrer" className="text-sage hover:underline">boxnow.bg/bg/locations</a>
+                        Не намирате вашия автомат?{' '}
+                        <a href="https://boxnow.bg/bg/locations" target="_blank" rel="noopener noreferrer" className="text-sage hover:underline">Вижте всички на boxnow.bg</a>
                       </p>
                     </div>
                   )}
@@ -260,22 +270,30 @@ export default function CheckoutPage() {
                     <div className="mb-8 space-y-4">
                       <div>
                         <label className="block font-sans text-sm text-navy mb-2">Град *</label>
-                        <input required type="text" value={speedyCity}
-                          onChange={(e) => setSpeedyCity(e.target.value)}
-                          placeholder="напр. София"
-                          className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy" />
+                        <SearchableSelect
+                          options={speedyCities.map((c) => ({ id: c, label: c }))}
+                          value={speedyCity || null}
+                          onChange={(_, label) => { setSpeedyCity(label); setSpeedyOfficeId(null); setSpeedyOffice('') }}
+                          placeholder="Изберете град..."
+                          searchPlaceholder="Търсете град..."
+                        />
                       </div>
-                      <div>
-                        <label className="block font-sans text-sm text-navy mb-2">Офис на Спиди *</label>
-                        <input required type="text" value={speedyOffice}
-                          onChange={(e) => setSpeedyOffice(e.target.value)}
-                          placeholder="напр. Спиди — бул. Витоша 10"
-                          className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy" />
-                        <p className="font-sans text-xs text-navy/40 mt-2">
-                          Намерете офис на{' '}
-                          <a href="https://www.speedy.bg/bg/offices-and-sps/" target="_blank" rel="noopener noreferrer" className="text-sage hover:underline">speedy.bg</a>
-                        </p>
-                      </div>
+                      {speedyCity && (
+                        <div>
+                          <label className="block font-sans text-sm text-navy mb-2">Офис на Спиди *</label>
+                          <SearchableSelect
+                            options={speedyOffices.filter(o => o.city === speedyCity).map(o => ({ id: o.id, label: o.name, sublabel: o.address }))}
+                            value={speedyOfficeId}
+                            onChange={(id, label) => { setSpeedyOfficeId(id); const off = speedyOffices.find(o => o.id === id); setSpeedyOffice(off ? `${off.name} — ${off.address}` : label) }}
+                            placeholder="Изберете офис..."
+                            searchPlaceholder="Търсете офис или адрес..."
+                          />
+                          <p className="font-sans text-xs text-navy/40 mt-2">
+                            Не намирате офис?{' '}
+                            <a href="https://www.speedy.bg/bg/offices-and-sps/" target="_blank" rel="noopener noreferrer" className="text-sage hover:underline">Вижте всички на speedy.bg</a>
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
 

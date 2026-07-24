@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { Gift, Mail, Store, Package } from 'lucide-react'
 import toast from 'react-hot-toast'
+import SearchableSelect from '@/components/ui/SearchableSelect'
+import { boxnowLocations } from '@/data/boxnow-locations'
 
 type VoucherType = 'workshop' | 'value'
 type DeliveryMethod = 'digital' | 'atelier' | 'boxnow'
@@ -15,6 +17,7 @@ export default function VouchersPage() {
   const [voucherType, setVoucherType] = useState<VoucherType>('value')
   const [selectedValue, setSelectedValue] = useState<number>(50)
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('digital')
+  const [boxnowId, setBoxnowId] = useState<string | null>(null)
   const [boxnowAddress, setBoxnowAddress] = useState('')
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
@@ -31,8 +34,8 @@ export default function VouchersPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (deliveryMethod === 'boxnow' && !boxnowAddress.trim()) {
-      toast.error('Моля, въведете адрес на BoxNow автомат.')
+    if (deliveryMethod === 'boxnow' && !boxnowId) {
+      toast.error('Моля, изберете BoxNow автомат.')
       return
     }
     setLoading(true)
@@ -175,20 +178,18 @@ export default function VouchersPage() {
 
           {deliveryMethod === 'boxnow' && (
             <div className="mt-4">
-              <label className="block font-sans text-sm text-navy mb-2">
-                Адрес или наименование на BoxNow автомат *
-              </label>
-              <input
-                type="text"
-                value={boxnowAddress}
-                onChange={(e) => setBoxnowAddress(e.target.value)}
-                placeholder="напр. BoxNow — Mall of Sofia, ет. 0"
-                className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy"
+              <label className="block font-sans text-sm text-navy mb-2">Изберете BoxNow автомат *</label>
+              <SearchableSelect
+                options={boxnowLocations.map((l) => ({ id: l.id, label: l.name, sublabel: `${l.address}, ${l.city}` }))}
+                value={boxnowId}
+                onChange={(id) => { setBoxnowId(id); const loc = boxnowLocations.find(l => l.id === id); setBoxnowAddress(loc ? `${loc.name} — ${loc.address}, ${loc.city}` : '') }}
+                placeholder="Изберете автомат..."
+                searchPlaceholder="Търсете по квартал, мол или адрес..."
               />
               <p className="font-sans text-xs text-navy/40 mt-2">
-                Намерете автомат на{' '}
+                Не намирате вашия автомат?{' '}
                 <a href="https://boxnow.bg/bg/locations" target="_blank" rel="noopener noreferrer" className="text-sage hover:underline">
-                  boxnow.bg/bg/locations
+                  Вижте всички на boxnow.bg
                 </a>
               </p>
             </div>
