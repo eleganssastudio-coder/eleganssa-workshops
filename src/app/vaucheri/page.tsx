@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { Gift, Mail, Store, Package } from 'lucide-react'
 import toast from 'react-hot-toast'
-import SearchableSelect from '@/components/ui/SearchableSelect'
-import { boxnowLocations } from '@/data/boxnow-locations'
+import LocationFinderModal from '@/components/ui/LocationFinderModal'
+import { MapPin } from 'lucide-react'
 
 type VoucherType = 'workshop' | 'value'
 type DeliveryMethod = 'digital' | 'atelier' | 'boxnow'
@@ -17,8 +17,8 @@ export default function VouchersPage() {
   const [voucherType, setVoucherType] = useState<VoucherType>('value')
   const [selectedValue, setSelectedValue] = useState<number>(50)
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('digital')
-  const [boxnowId, setBoxnowId] = useState<string | null>(null)
   const [boxnowAddress, setBoxnowAddress] = useState('')
+  const [showBoxnowModal, setShowBoxnowModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
     senderName: '',
@@ -34,7 +34,7 @@ export default function VouchersPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (deliveryMethod === 'boxnow' && !boxnowId) {
+    if (deliveryMethod === 'boxnow' && !boxnowAddress.trim()) {
       toast.error('Моля, изберете BoxNow автомат.')
       return
     }
@@ -178,21 +178,26 @@ export default function VouchersPage() {
 
           {deliveryMethod === 'boxnow' && (
             <div className="mt-4">
-              <label className="block font-sans text-sm text-navy mb-2">Изберете BoxNow автомат *</label>
-              <SearchableSelect
-                options={boxnowLocations.map((l) => ({ id: l.id, label: l.name, sublabel: `${l.address}, ${l.city}` }))}
-                value={boxnowId}
-                onChange={(id) => { setBoxnowId(id); const loc = boxnowLocations.find(l => l.id === id); setBoxnowAddress(loc ? `${loc.name} — ${loc.address}, ${loc.city}` : '') }}
-                placeholder="Изберете автомат..."
-                searchPlaceholder="Търсете по квартал, мол или адрес..."
-              />
-              <p className="font-sans text-xs text-navy/40 mt-2">
-                Не намирате вашия автомат?{' '}
-                <a href="https://boxnow.bg/bg/locations" target="_blank" rel="noopener noreferrer" className="text-sage hover:underline">
-                  Вижте всички на boxnow.bg
-                </a>
-              </p>
+              <label className="block font-sans text-sm text-navy mb-2">BoxNow автомат *</label>
+              <button
+                type="button"
+                onClick={() => setShowBoxnowModal(true)}
+                className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-left flex items-center justify-between gap-2 hover:border-navy transition-colors"
+              >
+                <span className={boxnowAddress ? 'text-navy' : 'text-navy/40'}>
+                  {boxnowAddress || 'Изберете автомат от картата...'}
+                </span>
+                <MapPin className="w-4 h-4 text-navy/40 flex-shrink-0" />
+              </button>
             </div>
+          )}
+
+          {showBoxnowModal && (
+            <LocationFinderModal
+              type="boxnow"
+              onClose={() => setShowBoxnowModal(false)}
+              onManual={(address) => { setBoxnowAddress(address); setShowBoxnowModal(false) }}
+            />
           )}
         </div>
 
