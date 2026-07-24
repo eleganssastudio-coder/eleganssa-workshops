@@ -61,7 +61,7 @@ export default function NewProductsCarousel({ products }: { products: Product[] 
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {products.map((product) => (
-          <div key={product.id} className="flex-shrink-0 w-56 md:w-64 group">
+          <div key={product.id} className="flex-shrink-0 w-56 md:w-64 group flex flex-col">
             {/* Image */}
             <Link href={`/magazin/${product.slug}`} className="block relative aspect-square bg-cream overflow-hidden mb-3">
               {product.images[0] ? (
@@ -85,7 +85,7 @@ export default function NewProductsCarousel({ products }: { products: Product[] 
             </Link>
 
             {/* Info */}
-            <div>
+            <div className="flex flex-col flex-1">
               {product.category && (
                 <p className="font-sans text-xs text-navy/40 uppercase tracking-wider mb-1">
                   {product.category.name}
@@ -96,7 +96,7 @@ export default function NewProductsCarousel({ products }: { products: Product[] 
                   {product.name}
                 </p>
               </Link>
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center gap-2 mb-3 mt-auto">
                 <span className="font-serif text-base text-navy">{formatPrice(product.price)}</span>
                 {product.comparePrice && product.comparePrice > product.price && (
                   <span className="font-sans text-xs text-navy/40 line-through">{formatPrice(product.comparePrice)}</span>
