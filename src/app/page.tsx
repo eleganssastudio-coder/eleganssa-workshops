@@ -171,8 +171,8 @@ export default async function HomePage() {
           )}
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sage text-sm tracking-widest uppercase font-sans mb-4">
-            {hp.workshopCtaLabel || 'Творчески преживявания'}
+          <p className="text-cream/70 text-sm tracking-widest uppercase font-sans mb-4">
+            {hp.workshopCtaLabel || 'Преоткрий творчеството в теб'}
           </p>
           <h2 className="font-serif text-4xl md:text-5xl text-cream mb-6">
             {hp.workshopCtaTitle || 'Работилници за всеки'}
@@ -236,7 +236,7 @@ export default async function HomePage() {
       {/* Newsletter */}
       <section className="py-20 bg-navy">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sage text-sm tracking-widest uppercase font-sans mb-4">Бюлетин</p>
+          <p className="text-cream/70 text-sm tracking-widest uppercase font-sans mb-4">Изкуство за дома, ръчно направено с любов</p>
           <h2 className="font-serif text-4xl text-cream mb-4">
             {hp.newsletterTitle || 'Бъди в час с новостите'}
           </h2>
