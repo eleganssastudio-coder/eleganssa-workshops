@@ -11,6 +11,15 @@ import toast from 'react-hot-toast'
 type Step = 'shipping' | 'payment' | 'done'
 type PaymentMethod = 'bank' | 'cod'
 
+async function validateVoucher(code: string): Promise<{ valid: boolean; value?: number; type?: string }> {
+  try {
+    const res = await fetch(`/api/validate-voucher?code=${encodeURIComponent(code)}`)
+    return res.json()
+  } catch {
+    return { valid: false }
+  }
+}
+
 const steps = [
   { id: 'shipping', label: 'Доставка' },
   { id: 'payment', label: 'Плащане' },
@@ -23,13 +32,32 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('bank')
   const [loading, setLoading] = useState(false)
   const [orderNumber] = useState(`ES-${Date.now().toString().slice(-6)}`)
+  const [voucherCode, setVoucherCode] = useState('')
+  const [voucherDiscount, setVoucherDiscount] = useState(0)
+  const [voucherChecking, setVoucherChecking] = useState(false)
+  const [voucherMsg, setVoucherMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [shippingData, setShippingData] = useState({
     firstName: '', lastName: '', email: '', phone: '',
     street: '', city: '', postalCode: '',
   })
 
   const shipping = totalPrice() >= 100 ? 0 : 7
-  const total = totalPrice() + shipping
+  const total = Math.max(0, totalPrice() + shipping - voucherDiscount)
+
+  const applyVoucher = async () => {
+    if (!voucherCode.trim()) return
+    setVoucherChecking(true)
+    setVoucherMsg(null)
+    const result = await validateVoucher(voucherCode.trim().toUpperCase())
+    if (result.valid && result.type === 'value' && result.value) {
+      setVoucherDiscount(result.value)
+      setVoucherMsg({ ok: true, text: `Ваучерът е приложен — отстъпка ${result.value} €` })
+    } else {
+      setVoucherDiscount(0)
+      setVoucherMsg({ ok: false, text: 'Невалиден или вече използван ваучер.' })
+    }
+    setVoucherChecking(false)
+  }
 
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -54,6 +82,7 @@ export default function CheckoutPage() {
           'Начин на плащане': paymentMethod === 'bank' ? 'Банков превод' : 'Наложен платеж',
           'Продукти': itemsList,
           'Доставка': shipping === 0 ? 'Безплатна' : formatPrice(shipping),
+          ...(voucherDiscount > 0 ? { 'Ваучер': `-${formatPrice(voucherDiscount)}` } : {}),
           'Обща сума': formatPrice(total),
           'Имена': `${shippingData.firstName} ${shippingData.lastName}`,
           'Имейл': shippingData.email,
@@ -236,6 +265,33 @@ export default function CheckoutPage() {
                     </button>
                   </div>
 
+                  {/* Voucher code */}
+                  <div className="mb-6">
+                    <p className="font-sans text-sm font-medium text-navy mb-3">Код на ваучер (по избор)</p>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={voucherCode}
+                        onChange={(e) => { setVoucherCode(e.target.value.toUpperCase()); setVoucherMsg(null); setVoucherDiscount(0) }}
+                        placeholder="ELEG-XXXXXXXX"
+                        className="flex-1 border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy tracking-widest uppercase"
+                      />
+                      <button
+                        type="button"
+                        onClick={applyVoucher}
+                        disabled={voucherChecking || !voucherCode.trim()}
+                        className="btn-outline px-4 text-sm disabled:opacity-50"
+                      >
+                        {voucherChecking ? '...' : 'Приложи'}
+                      </button>
+                    </div>
+                    {voucherMsg && (
+                      <p className={`font-sans text-xs mt-2 ${voucherMsg.ok ? 'text-sage' : 'text-red-500'}`}>
+                        {voucherMsg.text}
+                      </p>
+                    )}
+                  </div>
+
                   <div className="flex gap-3">
                     <button type="button" onClick={() => setCurrentStep('shipping')} className="btn-outline">
                       Назад
@@ -281,6 +337,12 @@ export default function CheckoutPage() {
                     <span>Доставка</span>
                     <span>{shipping === 0 ? 'Безплатна' : formatPrice(shipping)}</span>
                   </div>
+                  {voucherDiscount > 0 && (
+                    <div className="flex justify-between font-sans text-sm text-sage">
+                      <span>Ваучер</span>
+                      <span>-{formatPrice(voucherDiscount)}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="border-t border-navy/10 pt-4">
                   <div className="flex justify-between">

@@ -11,6 +11,7 @@ const navLinks = [
   { href: '/', label: 'Начало' },
   { href: '/magazin', label: 'Магазин' },
   { href: '/rabotilnitsi', label: 'Работилници' },
+  { href: '/vaucheri', label: 'Ваучери' },
   { href: '/za-nas', label: 'За нас' },
   { href: '/kontakti', label: 'Контакти' },
 ]
