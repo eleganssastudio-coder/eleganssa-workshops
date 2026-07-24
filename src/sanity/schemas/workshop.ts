@@ -14,7 +14,26 @@ export default defineType({
     defineField({ name: 'duration', title: 'Продължителност', type: 'string' }),
     defineField({ name: 'maxSpots', title: 'Макс. участника', type: 'number', initialValue: 8 }),
     defineField({ name: 'includes', title: 'Включва', type: 'array', of: [{ type: 'string' }], description: 'Какво включва цената' }),
-    defineField({ name: 'steps', title: 'Стъпки на работилницата', type: 'array', of: [{ type: 'string' }] }),
+    defineField({
+      name: 'steps',
+      title: 'Стъпки на работилницата',
+      type: 'array',
+      of: [{
+        type: 'object',
+        name: 'step',
+        title: 'Стъпка',
+        fields: [
+          { name: 'text', title: 'Описание', type: 'string', validation: (r: any) => r.required() },
+          { name: 'image', title: 'Снимка (по избор)', type: 'image', options: { hotspot: true } },
+        ],
+        preview: {
+          select: { title: 'text', media: 'image' },
+          prepare({ title, media }: { title?: string; media?: any }) {
+            return { title: title || 'Стъпка', media }
+          },
+        },
+      }],
+    }),
     defineField({
       name: 'sessions',
       title: 'Дати и часове',
