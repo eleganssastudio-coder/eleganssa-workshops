@@ -33,7 +33,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
           type: v.type || '',
           options: Array.isArray(v.options)
             ? v.options.map((o: any) =>
-                typeof o === 'string' ? { value: o } : { value: o.value || '', price: o.price ?? null }
+                typeof o === 'string' ? { value: o, price: null, image: null } : { value: o.value || '', price: o.price ?? null, image: o.image ?? null }
               )
             : [],
         }))

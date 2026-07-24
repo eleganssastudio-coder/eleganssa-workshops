@@ -40,11 +40,12 @@ export default defineType({
               fields: [
                 { name: 'value', title: 'Стойност (напр. 100мл)', type: 'string', validation: (r: any) => r.required() },
                 { name: 'price', title: 'Цена (€) — оставете празно за основна цена', type: 'number' },
+                { name: 'image', title: 'Снимка на варианта (по избор)', type: 'image', options: { hotspot: true } },
               ],
               preview: {
-                select: { title: 'value', subtitle: 'price' },
-                prepare({ title, subtitle }: { title?: string; subtitle?: number }) {
-                  return { title: title || '', subtitle: subtitle ? `${subtitle} €` : 'основна цена' }
+                select: { title: 'value', subtitle: 'price', media: 'image' },
+                prepare({ title, subtitle, media }: { title?: string; subtitle?: number; media?: any }) {
+                  return { title: title || '', subtitle: subtitle ? `${subtitle} €` : 'основна цена', media }
                 },
               },
             }],
