@@ -20,9 +20,9 @@ interface WorkshopCardProps {
 
 export default function WorkshopCard({ workshop }: WorkshopCardProps) {
   return (
-    <div className="group bg-white border border-cream/80 overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <Link href={`/rabotilnitsi/${workshop.slug}`} className="block">
-        <div className="relative aspect-[4/3] overflow-hidden">
+    <div className="group bg-white border border-cream/80 overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
+      <Link href={`/rabotilnitsi/${workshop.slug}`} className="flex flex-col flex-1">
+        <div className="relative aspect-[4/3] overflow-hidden flex-shrink-0">
           <Image
             src={workshop.image}
             alt={workshop.title}
@@ -43,14 +43,14 @@ export default function WorkshopCard({ workshop }: WorkshopCardProps) {
             </div>
           </div>
         </div>
-        <div className="p-6">
+        <div className="p-6 flex flex-col flex-1">
           <h3 className="font-serif text-xl text-navy mb-2 group-hover:text-sage transition-colors">
             {workshop.title}
           </h3>
           <p className="text-navy/70 text-sm font-sans leading-relaxed mb-4 line-clamp-2">
             {workshop.shortDesc}
           </p>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mt-auto">
             <div>
               <p className="text-xs text-sage uppercase tracking-widest font-sans mb-1">Цена на участник</p>
               <p className="font-serif text-2xl text-terracotta">{formatPrice(workshop.price)}</p>
