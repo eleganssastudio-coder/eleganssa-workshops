@@ -19,6 +19,7 @@ export default defineConfig({
             S.listItem().title('Отзиви').schemaType('review').child(S.documentTypeList('review')),
             S.listItem().title('Категории').schemaType('category').child(S.documentTypeList('category')),
             S.listItem().title('Начална страница').schemaType('homepage').child(S.document().schemaType('homepage').documentId('homepage')),
+            S.listItem().title('За нас').schemaType('about').child(S.document().schemaType('about').documentId('about')),
           ]),
     }),
     visionTool(),
