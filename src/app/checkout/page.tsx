@@ -3,13 +3,14 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronRight, CheckCircle, Banknote, Truck } from 'lucide-react'
+import { ChevronRight, CheckCircle, Banknote, Truck, Package } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
 type Step = 'shipping' | 'payment' | 'done'
 type PaymentMethod = 'bank' | 'cod'
+type DeliveryType = 'boxnow' | 'speedy'
 
 async function validateVoucher(code: string): Promise<{ valid: boolean; value?: number; type?: string }> {
   try {
@@ -36,13 +37,16 @@ export default function CheckoutPage() {
   const [voucherDiscount, setVoucherDiscount] = useState(0)
   const [voucherChecking, setVoucherChecking] = useState(false)
   const [voucherMsg, setVoucherMsg] = useState<{ ok: boolean; text: string } | null>(null)
+  const [deliveryType, setDeliveryType] = useState<DeliveryType>('boxnow')
+  const [boxnowAddress, setBoxnowAddress] = useState('')
+  const [speedyCity, setSpeedyCity] = useState('')
+  const [speedyOffice, setSpeedyOffice] = useState('')
   const [shippingData, setShippingData] = useState({
     firstName: '', lastName: '', email: '', phone: '',
-    street: '', city: '', postalCode: '',
   })
 
-  const shipping = totalPrice() >= 100 ? 0 : 7
-  const total = Math.max(0, totalPrice() + shipping - voucherDiscount)
+  const shipping = deliveryType === 'boxnow' ? 0 : null // BoxNow free; Speedy per tariff
+  const total = Math.max(0, totalPrice() + (shipping ?? 0) - voucherDiscount)
 
   const applyVoucher = async () => {
     if (!voucherCode.trim()) return
@@ -81,13 +85,14 @@ export default function CheckoutPage() {
           'Номер на поръчката': orderNumber,
           'Начин на плащане': paymentMethod === 'bank' ? 'Банков превод' : 'Наложен платеж',
           'Продукти': itemsList,
-          'Доставка': shipping === 0 ? 'Безплатна' : formatPrice(shipping),
+          'Доставка': deliveryType === 'boxnow'
+            ? `BoxNow — безплатно · ${boxnowAddress}`
+            : `Спиди офис — по тарифа · ${speedyCity}, ${speedyOffice}`,
           ...(voucherDiscount > 0 ? { 'Ваучер': `-${formatPrice(voucherDiscount)}` } : {}),
-          'Обща сума': formatPrice(total),
+          'Обща сума': deliveryType === 'speedy' ? `${formatPrice(total)} + доставка Спиди` : formatPrice(total),
           'Имена': `${shippingData.firstName} ${shippingData.lastName}`,
           'Имейл': shippingData.email,
           'Телефон': shippingData.phone,
-          'Адрес': `${shippingData.street}, ${shippingData.postalCode} ${shippingData.city}`,
         }),
       })
     } catch (_) {
@@ -162,8 +167,22 @@ export default function CheckoutPage() {
                 Ще платите <strong>{formatPrice(total)}</strong> при получаване на пратката.
               </p>
             )}
+            {deliveryType === 'speedy' && (
+              <div className="bg-cream p-4 mb-4 text-left">
+                <p className="font-sans text-sm text-navy/70">
+                  Доставка чрез <strong>Спиди</strong> до офис <strong>{speedyOffice}, {speedyCity}</strong>. Цената за доставка ще ви бъде съобщена допълнително.
+                </p>
+              </div>
+            )}
+            {deliveryType === 'boxnow' && (
+              <div className="bg-cream p-4 mb-4 text-left">
+                <p className="font-sans text-sm text-navy/70">
+                  Доставка чрез <strong>BoxNow</strong> до автомат: <strong>{boxnowAddress}</strong>. Безплатна доставка.
+                </p>
+              </div>
+            )}
             <p className="font-sans text-sm text-navy/50 mb-8">
-              Потвърждение ще получите на <strong>{shippingData.email}</strong>. Очаквайте доставка в рамките на 3–5 работни дни.
+              Потвърждение ще получите на <strong>{shippingData.email}</strong>.
             </p>
             <Link href="/" className="btn-primary">Обратно към началото</Link>
           </div>
@@ -172,7 +191,7 @@ export default function CheckoutPage() {
             <div>
               {currentStep === 'shipping' && (
                 <form onSubmit={handleShippingSubmit}>
-                  <h2 className="font-serif text-2xl text-navy mb-6">Данни за доставка</h2>
+                  <h2 className="font-serif text-2xl text-navy mb-6">Вашите данни</h2>
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
                       <label className="block font-sans text-sm text-navy mb-2">Име *</label>
@@ -187,7 +206,7 @@ export default function CheckoutPage() {
                         className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="grid grid-cols-2 gap-4 mb-8">
                     <div>
                       <label className="block font-sans text-sm text-navy mb-2">Имейл *</label>
                       <input required type="email" value={shippingData.email}
@@ -201,26 +220,65 @@ export default function CheckoutPage() {
                         className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy" />
                     </div>
                   </div>
-                  <div className="mb-4">
-                    <label className="block font-sans text-sm text-navy mb-2">Адрес *</label>
-                    <input required type="text" value={shippingData.street}
-                      onChange={(e) => setShippingData({ ...shippingData, street: e.target.value })}
-                      className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy" />
+
+                  {/* Delivery */}
+                  <h2 className="font-serif text-2xl text-navy mb-4">Начин на доставка</h2>
+                  <div className="space-y-3 mb-4">
+                    <button type="button" onClick={() => setDeliveryType('boxnow')}
+                      className={`w-full text-left p-5 border-2 flex items-start gap-4 transition-colors ${deliveryType === 'boxnow' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}>
+                      <Package className={`w-5 h-5 mt-0.5 flex-shrink-0 ${deliveryType === 'boxnow' ? 'text-navy' : 'text-navy/40'}`} />
+                      <div>
+                        <p className="font-sans font-medium text-navy text-sm">BoxNow автомат — Безплатно</p>
+                        <p className="font-sans text-xs text-navy/50 mt-0.5">Получавате пратката от BoxNow автомат по ваш избор.</p>
+                      </div>
+                    </button>
+                    <button type="button" onClick={() => setDeliveryType('speedy')}
+                      className={`w-full text-left p-5 border-2 flex items-start gap-4 transition-colors ${deliveryType === 'speedy' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}>
+                      <Truck className={`w-5 h-5 mt-0.5 flex-shrink-0 ${deliveryType === 'speedy' ? 'text-navy' : 'text-navy/40'}`} />
+                      <div>
+                        <p className="font-sans font-medium text-navy text-sm">Спиди — офис по избор</p>
+                        <p className="font-sans text-xs text-navy/50 mt-0.5">Цената е по тарифата на Спиди и ще бъде потвърдена след поръчката.</p>
+                      </div>
+                    </button>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 mb-8">
-                    <div>
-                      <label className="block font-sans text-sm text-navy mb-2">Град *</label>
-                      <input required type="text" value={shippingData.city}
-                        onChange={(e) => setShippingData({ ...shippingData, city: e.target.value })}
+
+                  {deliveryType === 'boxnow' && (
+                    <div className="mb-8">
+                      <label className="block font-sans text-sm text-navy mb-2">Адрес на BoxNow автомат *</label>
+                      <input required type="text" value={boxnowAddress}
+                        onChange={(e) => setBoxnowAddress(e.target.value)}
+                        placeholder="напр. BoxNow — Mall of Sofia, ет. 0"
                         className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy" />
+                      <p className="font-sans text-xs text-navy/40 mt-2">
+                        Намерете автомат на{' '}
+                        <a href="https://boxnow.bg/bg/locations" target="_blank" rel="noopener noreferrer" className="text-sage hover:underline">boxnow.bg/bg/locations</a>
+                      </p>
                     </div>
-                    <div>
-                      <label className="block font-sans text-sm text-navy mb-2">Пощенски код *</label>
-                      <input required type="text" value={shippingData.postalCode}
-                        onChange={(e) => setShippingData({ ...shippingData, postalCode: e.target.value })}
-                        className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy" />
+                  )}
+
+                  {deliveryType === 'speedy' && (
+                    <div className="mb-8 space-y-4">
+                      <div>
+                        <label className="block font-sans text-sm text-navy mb-2">Град *</label>
+                        <input required type="text" value={speedyCity}
+                          onChange={(e) => setSpeedyCity(e.target.value)}
+                          placeholder="напр. София"
+                          className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy" />
+                      </div>
+                      <div>
+                        <label className="block font-sans text-sm text-navy mb-2">Офис на Спиди *</label>
+                        <input required type="text" value={speedyOffice}
+                          onChange={(e) => setSpeedyOffice(e.target.value)}
+                          placeholder="напр. Спиди — бул. Витоша 10"
+                          className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy" />
+                        <p className="font-sans text-xs text-navy/40 mt-2">
+                          Намерете офис на{' '}
+                          <a href="https://www.speedy.bg/bg/offices-and-sps/" target="_blank" rel="noopener noreferrer" className="text-sage hover:underline">speedy.bg</a>
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  )}
+
                   <button type="submit" className="btn-primary w-full text-center">
                     Продължи към плащане
                   </button>
@@ -335,7 +393,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between font-sans text-sm text-navy">
                     <span>Доставка</span>
-                    <span>{shipping === 0 ? 'Безплатна' : formatPrice(shipping)}</span>
+                    <span>{deliveryType === 'boxnow' ? 'BoxNow — безплатно' : 'Спиди — по тарифа'}</span>
                   </div>
                   {voucherDiscount > 0 && (
                     <div className="flex justify-between font-sans text-sm text-sage">

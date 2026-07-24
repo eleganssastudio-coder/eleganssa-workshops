@@ -1,16 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import { Gift, CheckCircle } from 'lucide-react'
+import { Gift, Mail, Store, Package } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 type VoucherType = 'workshop' | 'value'
+type DeliveryMethod = 'digital' | 'atelier' | 'boxnow'
 
 const valueOptions = [25, 50, 75, 100, 150]
+
+const WORKSHOP_PRICE = 39
 
 export default function VouchersPage() {
   const [voucherType, setVoucherType] = useState<VoucherType>('value')
   const [selectedValue, setSelectedValue] = useState<number>(50)
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('digital')
+  const [boxnowAddress, setBoxnowAddress] = useState('')
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
     senderName: '',
@@ -20,10 +25,16 @@ export default function VouchersPage() {
     message: '',
   })
 
-  const price = voucherType === 'workshop' ? 0 : selectedValue
+  const voucherPrice = voucherType === 'workshop' ? WORKSHOP_PRICE : selectedValue
+  const deliveryPrice = deliveryMethod === 'boxnow' ? 0 : 0 // BoxNow free, atelier free, digital free
+  const totalPrice = voucherPrice + deliveryPrice
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (deliveryMethod === 'boxnow' && !boxnowAddress.trim()) {
+      toast.error('Моля, въведете адрес на BoxNow автомат.')
+      return
+    }
     setLoading(true)
     try {
       const res = await fetch('/api/buy-voucher', {
@@ -31,7 +42,9 @@ export default function VouchersPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           voucherType,
-          value: voucherType === 'value' ? selectedValue : null,
+          value: voucherType === 'value' ? selectedValue : WORKSHOP_PRICE,
+          deliveryMethod,
+          boxnowAddress: deliveryMethod === 'boxnow' ? boxnowAddress : '',
           ...form,
         }),
       })
@@ -77,7 +90,7 @@ export default function VouchersPage() {
               className={`p-6 border-2 text-left transition-colors ${voucherType === 'workshop' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}
             >
               <p className="font-serif text-lg text-navy mb-1">За работилница</p>
-              <p className="font-sans text-xs text-navy/50">За работилница по избор</p>
+              <p className="font-sans text-xs text-navy/50">Участие в работилница — 39 €</p>
             </button>
           </div>
         </div>
@@ -106,10 +119,81 @@ export default function VouchersPage() {
         {voucherType === 'workshop' && (
           <div className="mb-8 bg-cream p-6">
             <p className="font-sans text-sm text-navy/70">
-              Ваучерът дава право на участие в работилница по избор на получателя. Цената се определя от избраната работилница и ще бъде посочена при плащането.
+              Ваучерът дава право на участие в работилница по избор на получателя. Цената включва всички материали и инструкции.
             </p>
           </div>
         )}
+
+        {/* Delivery method */}
+        <div className="mb-8">
+          <p className="font-serif text-xl text-navy mb-4">Формат на ваучера</p>
+          <div className="space-y-3">
+            <button
+              type="button"
+              onClick={() => setDeliveryMethod('digital')}
+              className={`w-full text-left p-5 border-2 flex items-start gap-4 transition-colors ${deliveryMethod === 'digital' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}
+            >
+              <Mail className={`w-5 h-5 mt-0.5 flex-shrink-0 ${deliveryMethod === 'digital' ? 'text-navy' : 'text-navy/40'}`} />
+              <div>
+                <p className="font-sans font-medium text-navy text-sm">Дигитален — по имейл</p>
+                <p className="font-sans text-xs text-navy/50 mt-0.5">Ваучерът се изпраща незабавно на имейла на получателя. Безплатно.</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setDeliveryMethod('atelier')}
+              className={`w-full text-left p-5 border-2 flex items-start gap-4 transition-colors ${deliveryMethod === 'atelier' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}
+            >
+              <Store className={`w-5 h-5 mt-0.5 flex-shrink-0 ${deliveryMethod === 'atelier' ? 'text-navy' : 'text-navy/40'}`} />
+              <div>
+                <p className="font-sans font-medium text-navy text-sm">Физическа картичка — от ателието</p>
+                <p className="font-sans text-xs text-navy/50 mt-0.5">Красива картичка в плик, която получавате лично от нас. Свържете се с нас за ден и час.</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setDeliveryMethod('boxnow')}
+              className={`w-full text-left p-5 border-2 flex items-start gap-4 transition-colors ${deliveryMethod === 'boxnow' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}
+            >
+              <Package className={`w-5 h-5 mt-0.5 flex-shrink-0 ${deliveryMethod === 'boxnow' ? 'text-navy' : 'text-navy/40'}`} />
+              <div>
+                <p className="font-sans font-medium text-navy text-sm">Физическа картичка — BoxNow автомат</p>
+                <p className="font-sans text-xs text-navy/50 mt-0.5">Доставка до BoxNow автомат по ваш избор. Безплатно.</p>
+              </div>
+            </button>
+          </div>
+
+          {deliveryMethod === 'atelier' && (
+            <div className="mt-4 bg-cream p-4">
+              <p className="font-sans text-sm text-navy/70">
+                След завършване на поръчката се свържете с нас на <strong>eleganssastudio@gmail.com</strong> или чрез формата за контакт, за да уговорим удобен ден и час за получаване.
+              </p>
+            </div>
+          )}
+
+          {deliveryMethod === 'boxnow' && (
+            <div className="mt-4">
+              <label className="block font-sans text-sm text-navy mb-2">
+                Адрес или наименование на BoxNow автомат *
+              </label>
+              <input
+                type="text"
+                value={boxnowAddress}
+                onChange={(e) => setBoxnowAddress(e.target.value)}
+                placeholder="напр. BoxNow — Mall of Sofia, ет. 0"
+                className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy"
+              />
+              <p className="font-sans text-xs text-navy/40 mt-2">
+                Намерете автомат на{' '}
+                <a href="https://boxnow.bg/bg/locations" target="_blank" rel="noopener noreferrer" className="text-sage hover:underline">
+                  boxnow.bg/bg/locations
+                </a>
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Sender info */}
         <div className="mb-8">
@@ -177,18 +261,23 @@ export default function VouchersPage() {
 
         {/* Summary */}
         <div className="bg-cream p-6 mb-8">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-start">
             <div>
               <p className="font-serif text-lg text-navy">
                 {voucherType === 'value' ? `Ваучер ${selectedValue} €` : 'Ваучер за работилница'}
               </p>
               <p className="font-sans text-xs text-navy/50 mt-1">
-                Кодът ще бъде изпратен на {form.recipientEmail || 'имейла на получателя'}
+                {deliveryMethod === 'digital' && 'Дигитален — по имейл'}
+                {deliveryMethod === 'atelier' && 'Физическа картичка — от ателието'}
+                {deliveryMethod === 'boxnow' && 'Физическа картичка — BoxNow'}
               </p>
+              {form.recipientEmail && (
+                <p className="font-sans text-xs text-navy/40 mt-1">
+                  За: {form.recipientName || form.recipientEmail}
+                </p>
+              )}
             </div>
-            {voucherType === 'value' && (
-              <p className="font-serif text-2xl text-navy">{selectedValue} €</p>
-            )}
+            <p className="font-serif text-2xl text-navy">{totalPrice} €</p>
           </div>
         </div>
 
@@ -197,7 +286,7 @@ export default function VouchersPage() {
           disabled={loading}
           className="btn-primary w-full text-center disabled:opacity-50"
         >
-          {loading ? 'Пренасочване...' : voucherType === 'value' ? `Плати ${selectedValue} € с карта` : 'Избери работилница и плати'}
+          {loading ? 'Пренасочване...' : `Плати ${totalPrice} € с карта`}
         </button>
       </form>
     </div>
