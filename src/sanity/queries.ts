@@ -103,6 +103,45 @@ export const homepageQuery = groq`
   *[_type == "homepage"][0] {
     heroTitle,
     heroSubtitle,
-    "heroImage": heroImage.asset->url
+    heroLabel,
+    heroOverlayOpacity,
+    heroTextColor,
+    heroCta1Label,
+    heroCta1Link,
+    heroCta2Label,
+    heroCta2Link,
+    "heroImage": heroImage.asset->url,
+    pillars,
+    workshopCtaTitle,
+    workshopCtaLabel,
+    workshopCtaText,
+    workshopCtaBullets,
+    workshopCtaBtnLabel,
+    workshopCtaOverlay,
+    "workshopCtaImage": workshopCtaImage.asset->url,
+    newsletterTitle,
+    newsletterText
+  }
+`
+
+export const aboutQuery = groq`
+  *[_type == "about"][0] {
+    heroTitle,
+    heroSubtitle,
+    heroLabel,
+    heroOverlayOpacity,
+    "heroImage": heroImage.asset->url,
+    storyLabel,
+    storyTitle,
+    "storyBody": pt::text(storyBody),
+    "mainImage": mainImage.asset->url,
+    "secondaryImage": secondaryImage.asset->url,
+    valuesLabel,
+    valuesTitle,
+    values,
+    instagramTitle,
+    instagramText,
+    instagramHandle,
+    instagramUrl
   }
 `
