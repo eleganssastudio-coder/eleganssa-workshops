@@ -35,6 +35,7 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
   const [spots, setSpots] = useState(1)
   const [step, setStep] = useState<'select' | 'book' | 'done'>('select')
   const [form, setForm] = useState({ name: '', email: '', phone: '' })
+  const [bookingId, setBookingId] = useState('')
 
   const sessions = workshop.sessions || []
   const includes = workshop.includes || []
@@ -48,8 +49,35 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
   }
   const description = toText(workshop.description) || toText(workshop.shortDescription)
 
-  const handleBook = (e: React.FormEvent) => {
+  const handleBook = async (e: React.FormEvent) => {
     e.preventDefault()
+    const id = `WS-${Date.now().toString().slice(-6)}`
+    setBookingId(id)
+    const bookingId = id
+    const sessionInfo = session
+      ? `${formatDate(session.date)}, ${session.startTime}–${session.endTime}`
+      : 'По договаряне'
+
+    try {
+      await fetch('https://formspree.io/f/mpqgnbbd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          _subject: `Ново записване за работилница — ${bookingId}`,
+          'Номер на записването': bookingId,
+          'Работилница': workshop.title,
+          'Дата и час': sessionInfo,
+          'Брой участници': spots,
+          'Обща сума': `${workshop.price * spots} €`,
+          'Капаро': '20 €',
+          'Остатък за плащане на място': `${workshop.price * spots - 20} €`,
+          'Имена': form.name,
+          'Имейл': form.email,
+          'Телефон': form.phone,
+        }),
+      })
+    } catch (_) {}
+
     toast.success('Записването е изпратено! Ще получите потвърждение на имейла.')
     setStep('done')
   }
@@ -277,8 +305,14 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
                 <div className="text-center py-6">
                   <CheckCircle className="w-16 h-16 text-sage mx-auto mb-4" />
                   <h3 className="font-serif text-2xl text-navy mb-2">Записан!</h3>
+                  {bookingId && (
+                    <p className="font-sans text-xs text-navy/40 mb-2">Номер: {bookingId}</p>
+                  )}
+                  <p className="font-sans text-sm text-navy/60 mb-2">
+                    Ще получите потвърждение на <strong>{form.email}</strong> до 24 часа.
+                  </p>
                   <p className="font-sans text-sm text-navy/60 mb-6">
-                    Ще получите потвърждение на имейл {form.email} до 24 часа.
+                    Капаро: <strong>20 €</strong> — ще получите инструкции за плащане по имейл.
                   </p>
                   <button
                     onClick={() => { setStep('select'); setSelectedSession(null); setSpots(1) }}
