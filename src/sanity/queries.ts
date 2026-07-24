@@ -44,7 +44,7 @@ export const productBySlugQuery = groq`
     "images": images[].asset->url,
     inStock,
     featured,
-    "description": pt::text(description),
+    "description": select(defined(description) => pt::text(description), shortDescription),
     shortDescription,
     ingredients,
     variants[] {
