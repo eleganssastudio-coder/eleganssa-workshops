@@ -11,7 +11,7 @@ import StarRating from '@/components/ui/StarRating'
 import ProductCard from '@/components/ui/ProductCard'
 import toast from 'react-hot-toast'
 
-type VariantOption = { value: string; price?: number | null }
+type VariantOption = { value: string; price?: number | null; image?: string | null }
 type Variant = { type: string; options: VariantOption[] }
 type RelatedProduct = {
   _id?: string
@@ -92,6 +92,20 @@ export default function ProductDetailClient({
   const variants = product.variants || []
   const currentPrice = getSelectedPrice(product.price, variants, selectedVariants)
 
+  // If the selected variant has its own image, show it instead of the product gallery image
+  const variantImage = (() => {
+    for (const variant of variants) {
+      const chosenValue = selectedVariants[variant.type]
+      if (chosenValue) {
+        const opts = Array.isArray(variant.options) ? variant.options : []
+        const opt = opts.find(o => o.value === chosenValue)
+        if (opt?.image) return opt.image
+      }
+    }
+    return null
+  })()
+  const displayImage = variantImage || product.images[selectedImage]
+
   const variantString = Object.entries(selectedVariants)
     .map(([k, v]) => `${k}: ${v}`)
     .join(', ')
@@ -147,9 +161,9 @@ export default function ProductDetailClient({
           {/* Images */}
           <div>
             <div className="relative aspect-square bg-cream overflow-hidden mb-4">
-              {product.images[selectedImage] ? (
+              {displayImage ? (
                 <Image
-                  src={product.images[selectedImage]}
+                  src={displayImage}
                   alt={product.name}
                   fill
                   className="object-cover"

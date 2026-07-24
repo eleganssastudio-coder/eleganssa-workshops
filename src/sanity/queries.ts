@@ -14,7 +14,7 @@ export const productsQuery = groq`
     ingredients,
     variants[] {
       type,
-      options[] { value, price }
+      options[] { value, price, "image": image.asset->url }
     },
     category-> { name, "slug": slug.current }
   }
@@ -49,7 +49,7 @@ export const productBySlugQuery = groq`
     ingredients,
     variants[] {
       type,
-      options[] { value, price }
+      options[] { value, price, "image": image.asset->url }
     },
     category-> { name, "slug": slug.current }
   }
