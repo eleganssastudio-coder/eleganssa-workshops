@@ -90,7 +90,7 @@ export default function CheckoutPage() {
           'Продукти': itemsList,
           'Доставка': deliveryType === 'boxnow'
             ? `BoxNow — безплатно · ${boxnowAddress}`
-            : `Спиди офис — по тарифа · ${speedyCity}, ${speedyOffice}`,
+            : `Спиди офис — по тарифа · ${speedyOffice}`,
           ...(voucherDiscount > 0 ? { 'Ваучер': `-${formatPrice(voucherDiscount)}` } : {}),
           'Обща сума': deliveryType === 'speedy' ? `${formatPrice(total)} + доставка Спиди` : formatPrice(total),
           'Имена': `${shippingData.firstName} ${shippingData.lastName}`,
@@ -184,7 +184,7 @@ export default function CheckoutPage() {
             {deliveryType === 'speedy' && (
               <div className="bg-cream p-4 mb-4 text-left">
                 <p className="font-sans text-sm text-navy/70">
-                  Доставка чрез <strong>Спиди</strong> до офис <strong>{speedyOffice}, {speedyCity}</strong>. Цената за доставка ще ви бъде съобщена допълнително.
+                  Доставка чрез <strong>Спиди</strong> до офис <strong>{speedyOffice}</strong>. Цената за доставка ще ви бъде съобщена допълнително.
                 </p>
               </div>
             )}
