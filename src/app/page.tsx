@@ -1,13 +1,12 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { ArrowRight, Leaf, Sparkles, Heart } from 'lucide-react'
-import ProductCard from '@/components/ui/ProductCard'
+import { Leaf, Sparkles, Heart } from 'lucide-react'
 import WorkshopCard from '@/components/ui/WorkshopCard'
 import StarRating from '@/components/ui/StarRating'
 import NewProductsCarousel from '@/components/ui/NewProductsCarousel'
 import { client } from '@/sanity/client'
-import { featuredProductsQuery, newProductsQuery, workshopsQuery, featuredReviewsQuery, homepageQuery } from '@/sanity/queries'
+import { featuredProductsQuery, newProductsQuery, promoProductsQuery, workshopsQuery, featuredReviewsQuery, homepageQuery } from '@/sanity/queries'
 
 export const metadata: Metadata = {
   title: 'Начало',
@@ -46,6 +45,7 @@ export const revalidate = 60
 export default async function HomePage() {
   let featuredProducts: any[] = []
   let newProducts: any[] = []
+  let promoProducts: any[] = []
   let workshops: any[] = []
   let reviews: any[] = []
   let hp: any = {}
@@ -54,6 +54,7 @@ export default async function HomePage() {
     if (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
       featuredProducts = await client.fetch(featuredProductsQuery) || []
       newProducts = await client.fetch(newProductsQuery) || []
+      promoProducts = await client.fetch(promoProductsQuery) || []
       workshops = await client.fetch(workshopsQuery) || []
       reviews = await client.fetch(featuredReviewsQuery) || []
       hp = await client.fetch(homepageQuery) || {}
@@ -63,6 +64,7 @@ export default async function HomePage() {
   if (!featuredProducts.length) featuredProducts = STATIC_PRODUCTS
   else featuredProducts = featuredProducts.map((p: any) => ({ ...p, id: p._id || p.id || p.slug, images: Array.isArray(p.images) ? p.images.filter(Boolean) : [] }))
   newProducts = newProducts.map((p: any) => ({ ...p, id: p._id || p.id || p.slug, images: Array.isArray(p.images) ? p.images.filter(Boolean) : [] }))
+  promoProducts = promoProducts.map((p: any) => ({ ...p, id: p._id || p.id || p.slug, images: Array.isArray(p.images) ? p.images.filter(Boolean) : [] }))
   if (!workshops.length) workshops = STATIC_WORKSHOPS
   if (!reviews.length) reviews = STATIC_REVIEWS
 
@@ -157,26 +159,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="py-20 bg-light-cream">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <p className="section-subtitle">Нашите продукти</p>
-            <h2 className="section-title">Избрани изделия</h2>
-            <div className="w-16 h-px bg-sage mx-auto mt-4" />
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {featuredProducts.map((product: any) => (
-              <ProductCard key={product._id || product.id} product={product} />
-            ))}
-          </div>
-          <div className="text-center mt-12">
-            <Link href="/magazin" className="btn-outline inline-flex items-center gap-2">
-              Виж всички продукти <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Promo Products Carousel */}
+      <NewProductsCarousel products={promoProducts.length ? promoProducts : featuredProducts.filter((p: any) => p.comparePrice && p.comparePrice > p.price)} title="ПРОМО" />
 
       {/* Workshop CTA */}
       <section className="relative py-24 overflow-hidden">

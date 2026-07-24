@@ -19,7 +19,7 @@ type Product = {
   category?: { name: string; slug: string }
 }
 
-export default function NewProductsCarousel({ products }: { products: Product[] }) {
+export default function NewProductsCarousel({ products, title = 'НОВО' }: { products: Product[]; title?: string }) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const addItem = useCartStore((s) => s.addItem)
 
@@ -35,7 +35,7 @@ export default function NewProductsCarousel({ products }: { products: Product[] 
     <section className="py-16 bg-white overflow-hidden">
       {/* Header */}
       <div className="flex items-end justify-between mb-8 px-4 sm:px-6 lg:px-8">
-        <h2 className="font-serif text-4xl md:text-5xl text-navy tracking-tight">НОВО</h2>
+        <h2 className="font-serif text-4xl md:text-5xl text-navy tracking-tight">{title}</h2>
         <div className="flex items-center gap-3">
           <button
             onClick={() => scroll('left')}

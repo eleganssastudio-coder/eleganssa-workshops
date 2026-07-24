@@ -34,6 +34,19 @@ export const newProductsQuery = groq`
   }
 `
 
+export const promoProductsQuery = groq`
+  *[_type == "product" && defined(comparePrice) && comparePrice > price] | order(_createdAt desc)[0...12] {
+    _id,
+    name,
+    "slug": slug.current,
+    price,
+    comparePrice,
+    "images": images[].asset->url,
+    inStock,
+    category-> { name, "slug": slug.current }
+  }
+`
+
 export const featuredProductsQuery = groq`
   *[_type == "product" && featured == true] | order(order asc)[0...8] {
     _id,
