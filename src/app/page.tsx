@@ -5,8 +5,9 @@ import { ArrowRight, Leaf, Sparkles, Heart } from 'lucide-react'
 import ProductCard from '@/components/ui/ProductCard'
 import WorkshopCard from '@/components/ui/WorkshopCard'
 import StarRating from '@/components/ui/StarRating'
+import NewProductsCarousel from '@/components/ui/NewProductsCarousel'
 import { client } from '@/sanity/client'
-import { featuredProductsQuery, workshopsQuery, featuredReviewsQuery, homepageQuery } from '@/sanity/queries'
+import { featuredProductsQuery, newProductsQuery, workshopsQuery, featuredReviewsQuery, homepageQuery } from '@/sanity/queries'
 
 export const metadata: Metadata = {
   title: 'Начало',
@@ -44,6 +45,7 @@ export const revalidate = 60
 
 export default async function HomePage() {
   let featuredProducts: any[] = []
+  let newProducts: any[] = []
   let workshops: any[] = []
   let reviews: any[] = []
   let hp: any = {}
@@ -51,6 +53,7 @@ export default async function HomePage() {
   try {
     if (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
       featuredProducts = await client.fetch(featuredProductsQuery) || []
+      newProducts = await client.fetch(newProductsQuery) || []
       workshops = await client.fetch(workshopsQuery) || []
       reviews = await client.fetch(featuredReviewsQuery) || []
       hp = await client.fetch(homepageQuery) || {}
@@ -59,6 +62,7 @@ export default async function HomePage() {
 
   if (!featuredProducts.length) featuredProducts = STATIC_PRODUCTS
   else featuredProducts = featuredProducts.map((p: any) => ({ ...p, id: p._id || p.id || p.slug, images: Array.isArray(p.images) ? p.images.filter(Boolean) : [] }))
+  newProducts = newProducts.map((p: any) => ({ ...p, id: p._id || p.id || p.slug, images: Array.isArray(p.images) ? p.images.filter(Boolean) : [] }))
   if (!workshops.length) workshops = STATIC_WORKSHOPS
   if (!reviews.length) reviews = STATIC_REVIEWS
 
@@ -113,6 +117,9 @@ export default async function HomePage() {
           <div className="w-px h-16 bg-cream/40 mx-auto animate-pulse" />
         </div>
       </section>
+
+      {/* New Products Carousel */}
+      <NewProductsCarousel products={newProducts} />
 
       {/* Pillars */}
       <section className="py-16 bg-cream">

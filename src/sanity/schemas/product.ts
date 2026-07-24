@@ -13,6 +13,7 @@ export default defineType({
     defineField({ name: 'comparePrice', title: 'Стара цена (€)', type: 'number' }),
     defineField({ name: 'images', title: 'Снимки', type: 'array', of: [{ type: 'image', options: { hotspot: true } }], validation: r => r.required().min(1) }),
     defineField({ name: 'category', title: 'Категория', type: 'reference', to: [{ type: 'category' }], validation: r => r.required() }),
+    defineField({ name: 'isNew', title: 'Ново (показва се в секцията „НОВО")', type: 'boolean', initialValue: false }),
     defineField({ name: 'ingredients', title: 'Съставки / Материали', type: 'text', rows: 4 }),
     defineField({
       name: 'variants',
