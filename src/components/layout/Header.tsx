@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { Search, Heart, ShoppingBag, Menu, X } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { useWishlistStore } from '@/store/wishlistStore'
@@ -43,14 +42,11 @@ export default function Header({ siteLogo, logoHeight }: { siteLogo?: string; lo
             {/* Logo */}
             <Link href="/" className="flex-shrink-0">
               {siteLogo ? (
-                <Image
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
                   src={siteLogo}
                   alt="Eleganssa Studio"
-                  height={logoHeight || 40}
-                  width={0}
                   style={{ height: logoHeight || 40, width: 'auto' }}
-                  className="object-contain"
-                  priority
                 />
               ) : (
                 <span className="font-serif text-xl md:text-2xl text-navy tracking-wider lowercase">
