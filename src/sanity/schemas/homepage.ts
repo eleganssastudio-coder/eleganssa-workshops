@@ -12,6 +12,10 @@ export default defineType({
     { name: 'seo', title: 'SEO' },
   ],
   fields: [
+    // ── LOGO ──────────────────────────────────────────────────────────
+    defineField({ name: 'siteLogo', title: 'Лого (по избор)', type: 'image', options: { hotspot: false }, description: 'Качи векторно или растерно лого. Ако няма лого, ще се показва текстът "eleganssa studio".' }),
+    defineField({ name: 'logoHeight', title: 'Височина на логото (px)', type: 'number', initialValue: 40, description: 'Препоръчително: 32–56px' }),
+
     // ── HERO ──────────────────────────────────────────────────────────
     defineField({ name: 'heroImage', title: 'Hero снимка', type: 'image', options: { hotspot: true }, group: 'hero' }),
     defineField({

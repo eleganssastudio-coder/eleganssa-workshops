@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Search, Heart, ShoppingBag, Menu, X } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { useWishlistStore } from '@/store/wishlistStore'
@@ -16,7 +17,7 @@ const navLinks = [
   { href: '/kontakti', label: 'Контакти' },
 ]
 
-export default function Header() {
+export default function Header({ siteLogo, logoHeight }: { siteLogo?: string; logoHeight?: number }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const toggleCart = useCartStore((s) => s.toggleCart)
@@ -41,9 +42,21 @@ export default function Header() {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <Link href="/" className="flex-shrink-0">
-              <span className="font-serif text-xl md:text-2xl text-navy tracking-wider lowercase">
-                eleganssa studio
-              </span>
+              {siteLogo ? (
+                <Image
+                  src={siteLogo}
+                  alt="Eleganssa Studio"
+                  height={logoHeight || 40}
+                  width={0}
+                  style={{ height: logoHeight || 40, width: 'auto' }}
+                  className="object-contain"
+                  priority
+                />
+              ) : (
+                <span className="font-serif text-xl md:text-2xl text-navy tracking-wider lowercase">
+                  eleganssa studio
+                </span>
+              )}
             </Link>
 
             {/* Desktop Nav */}

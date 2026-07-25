@@ -126,6 +126,13 @@ export const featuredReviewsQuery = groq`
   }
 `
 
+export const siteLogoQuery = groq`
+  *[_type == "homepage"][0] {
+    "siteLogo": siteLogo.asset->url,
+    logoHeight
+  }
+`
+
 export const homepageQuery = groq`
   *[_type == "homepage"][0] {
     heroTitle,

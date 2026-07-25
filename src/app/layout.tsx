@@ -5,6 +5,8 @@ import Footer from '@/components/layout/Footer'
 import CartDrawer from '@/components/cart/CartDrawer'
 import CookieBanner from '@/components/layout/CookieBanner'
 import { Toaster } from 'react-hot-toast'
+import { client } from '@/sanity/client'
+import { siteLogoQuery } from '@/sanity/queries'
 
 export const metadata: Metadata = {
   title: {
@@ -52,11 +54,18 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  let logoData: { siteLogo?: string; logoHeight?: number } = {}
+  try {
+    if (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
+      logoData = await client.fetch(siteLogoQuery) || {}
+    }
+  } catch (_) {}
+
   return (
     <html lang="bg">
       <head>
@@ -68,7 +77,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <Header />
+        <Header siteLogo={logoData.siteLogo} logoHeight={logoData.logoHeight} />
         <main>{children}</main>
         <Footer />
         <CartDrawer />
