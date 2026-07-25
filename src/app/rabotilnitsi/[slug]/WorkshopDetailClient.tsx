@@ -30,14 +30,15 @@ type StepData = { title?: string; text?: any[]; image?: string; video?: string; 
 
 function StepCard({ step, videoUrl }: { step: StepData; videoUrl?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const [playing, setPlaying] = useState(false)
 
-  const handleMouseEnter = () => {
-    videoRef.current?.play()
-  }
-  const handleMouseLeave = () => {
+  const play = () => { videoRef.current?.play(); setPlaying(true) }
+  const pause = () => {
     const v = videoRef.current
     if (v) { v.pause(); v.currentTime = 0 }
+    setPlaying(false)
   }
+  const handleTouch = () => { playing ? pause() : play() }
 
   return (
     <div className="flex flex-col">
@@ -48,16 +49,18 @@ function StepCard({ step, videoUrl }: { step: StepData; videoUrl?: string }) {
       )}
       {videoUrl && (
         <div
-          className="relative aspect-square overflow-hidden mb-4 bg-black cursor-pointer"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          className="relative aspect-square overflow-hidden mb-4 cursor-pointer"
+          onMouseEnter={play}
+          onMouseLeave={pause}
+          onTouchStart={handleTouch}
         >
           <video
             ref={videoRef}
             muted
             playsInline
             loop
-            preload="metadata"
+            preload="auto"
+            poster={step.image || undefined}
             className="absolute inset-0 w-full h-full object-cover"
           >
             <source src={videoUrl} type="video/mp4" />
