@@ -23,6 +23,7 @@ export default defineConfig({
             S.listItem().title('Страница Работилници').schemaType('workshopsPage').child(S.document().schemaType('workshopsPage').documentId('workshopsPage')),
             S.listItem().title('Ваучери').schemaType('voucher').child(S.documentTypeList('voucher')),
             S.listItem().title('Правни страници').schemaType('legalPage').child(S.documentTypeList('legalPage')),
+            S.listItem().title('Страница Контакти').schemaType('contactsPage').child(S.document().schemaType('contactsPage').documentId('contactsPage')),
           ]),
     }),
     visionTool(),

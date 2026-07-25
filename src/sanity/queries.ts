@@ -151,6 +151,20 @@ export const homepageQuery = groq`
   }
 `
 
+export const contactsPageQuery = groq`
+  *[_type == "contactsPage"][0] {
+    address,
+    addressLine2,
+    email,
+    phone,
+    instagramHandle,
+    instagramUrl,
+    workingHours,
+    privateTitle,
+    privateText
+  }
+`
+
 export const workshopsPageQuery = groq`
   *[_type == "workshopsPage"][0] {
     heroLabel,

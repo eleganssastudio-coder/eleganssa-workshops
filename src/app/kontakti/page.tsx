@@ -1,22 +1,44 @@
 'use client'
 
-import { useState } from 'react'
-import type { Metadata } from 'next'
-import { MapPin, Mail, Instagram, Clock, Send } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { MapPin, Mail, Instagram, Clock, Send, Phone } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function KontaktiPage() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   const [loading, setLoading] = useState(false)
+  const [info, setInfo] = useState<any>(null)
+
+  useEffect(() => {
+    fetch('/api/contacts-info').then(r => r.json()).then(setInfo).catch(() => {})
+  }, [])
+
+  const address = info?.address ?? 'Варна, ул. Бреза 2'
+  const addressLine2 = info?.addressLine2 ?? 'България'
+  const email = info?.email ?? 'eleganssastudio@gmail.com'
+  const phone = info?.phone ?? ''
+  const instagramHandle = info?.instagramHandle ?? 'eleganssastudio'
+  const instagramUrl = info?.instagramUrl ?? 'https://www.instagram.com/eleganssastudio/'
+  const workingHours: string[] = info?.workingHours ?? ['Вторник - Събота: 10:00 - 18:00', 'Неделя: 10:00 - 14:00', 'Понеделник: Затворено']
+  const privateTitle = info?.privateTitle ?? 'Корпоративни и частни поръчки'
+  const privateText = info?.privateText ?? 'Организираме частни работилници за рождени дни, моминско парти, корпоративен тийм билдинг и специални поводи. Свържете се с нас за персонализирана оферта.'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    // Simulate sending
-    await new Promise((r) => setTimeout(r, 1000))
-    toast.success('Съобщението е изпратено! Ще се свържем с вас до 24 часа.')
-    setForm({ name: '', email: '', subject: '', message: '' })
-    setLoading(false)
+    try {
+      await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, to: email }),
+      })
+      toast.success('Съобщението е изпратено! Ще се свържем с вас до 24 часа.')
+      setForm({ name: '', email: '', subject: '', message: '' })
+    } catch {
+      toast.error('Грешка. Моля, опитайте отново.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -41,8 +63,8 @@ export default function KontaktiPage() {
                 </div>
                 <div>
                   <h3 className="font-serif text-lg text-navy mb-1">Адрес</h3>
-                  <p className="font-sans text-navy/60 text-sm">Варна, ул. Бреза 2</p>
-                  <p className="font-sans text-navy/60 text-sm">България</p>
+                  <p className="font-sans text-navy/60 text-sm">{address}</p>
+                  {addressLine2 && <p className="font-sans text-navy/60 text-sm">{addressLine2}</p>}
                 </div>
               </div>
 
@@ -52,14 +74,25 @@ export default function KontaktiPage() {
                 </div>
                 <div>
                   <h3 className="font-serif text-lg text-navy mb-1">Имейл</h3>
-                  <a
-                    href="mailto:eleganssastudio@gmail.com"
-                    className="font-sans text-navy/60 text-sm hover:text-navy transition-colors"
-                  >
-                    eleganssastudio@gmail.com
+                  <a href={`mailto:${email}`} className="font-sans text-navy/60 text-sm hover:text-navy transition-colors">
+                    {email}
                   </a>
                 </div>
               </div>
+
+              {phone && (
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 border border-sage flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-4 h-4 text-sage" />
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-lg text-navy mb-1">Телефон</h3>
+                    <a href={`tel:${phone}`} className="font-sans text-navy/60 text-sm hover:text-navy transition-colors">
+                      {phone}
+                    </a>
+                  </div>
+                </div>
+              )}
 
               <div className="flex gap-4">
                 <div className="w-10 h-10 border border-sage flex items-center justify-center flex-shrink-0">
@@ -67,35 +100,30 @@ export default function KontaktiPage() {
                 </div>
                 <div>
                   <h3 className="font-serif text-lg text-navy mb-1">Instagram</h3>
-                  <a
-                    href="https://www.instagram.com/eleganssastudio/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-sans text-navy/60 text-sm hover:text-navy transition-colors"
-                  >
-                    @eleganssastudio
+                  <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="font-sans text-navy/60 text-sm hover:text-navy transition-colors">
+                    @{instagramHandle}
                   </a>
                 </div>
               </div>
 
-              <div className="flex gap-4">
-                <div className="w-10 h-10 border border-sage flex items-center justify-center flex-shrink-0">
-                  <Clock className="w-4 h-4 text-sage" />
+              {workingHours.length > 0 && (
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 border border-sage flex items-center justify-center flex-shrink-0">
+                    <Clock className="w-4 h-4 text-sage" />
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-lg text-navy mb-1">Работно време</h3>
+                    {workingHours.map((line: string, i: number) => (
+                      <p key={i} className="font-sans text-navy/60 text-sm">{line}</p>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-serif text-lg text-navy mb-1">Работно време</h3>
-                  <p className="font-sans text-navy/60 text-sm">Вторник - Събота: 10:00 - 18:00</p>
-                  <p className="font-sans text-navy/60 text-sm">Неделя: 10:00 - 14:00</p>
-                  <p className="font-sans text-navy/60 text-sm">Понеделник: Затворено</p>
-                </div>
-              </div>
+              )}
             </div>
 
             <div className="mt-10 bg-cream p-6">
-              <h3 className="font-serif text-xl text-navy mb-3">Корпоративни и частни поръчки</h3>
-              <p className="font-sans text-navy/60 text-sm leading-relaxed">
-                Организираме частни работилници за рождени дни, моминско парти, корпоративен тийм билдинг и специални поводи. Свържете се с нас за персонализирана оферта.
-              </p>
+              <h3 className="font-serif text-xl text-navy mb-3">{privateTitle}</h3>
+              <p className="font-sans text-navy/60 text-sm leading-relaxed">{privateText}</p>
             </div>
           </div>
 
@@ -148,11 +176,7 @@ export default function KontaktiPage() {
                   placeholder="Вашето съобщение..."
                 />
               </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary flex items-center gap-2 disabled:opacity-50"
-              >
+              <button type="submit" disabled={loading} className="btn-primary flex items-center gap-2 disabled:opacity-50">
                 <Send className="w-4 h-4" />
                 {loading ? 'Изпращане...' : 'Изпрати съобщение'}
               </button>
