@@ -93,7 +93,7 @@ export const workshopsQuery = groq`
     duration,
     maxSpots,
     includes,
-    steps[] { title, text, "image": image.asset->url, "video": video.asset->url, "videoMimeType": video.asset->mimeType },
+    steps[] { title, text, "image": image.asset->url, "video": video.asset->url + "." + video.asset->extension, "videoMimeType": video.asset->mimeType },
     sessions
   }
 `
@@ -110,7 +110,7 @@ export const workshopBySlugQuery = groq`
     duration,
     maxSpots,
     includes,
-    steps[] { title, text, "image": image.asset->url, "video": video.asset->url, "videoMimeType": video.asset->mimeType },
+    steps[] { title, text, "image": image.asset->url, "video": video.asset->url + "." + video.asset->extension, "videoMimeType": video.asset->mimeType },
     sessions
   }
 `
