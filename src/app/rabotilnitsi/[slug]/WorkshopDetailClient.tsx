@@ -22,7 +22,7 @@ export type WorkshopDetail = {
   duration: string
   maxSpots: number
   includes?: string[]
-  steps?: { title?: string; text?: any[]; image?: string; video?: string }[]
+  steps?: { title?: string; text?: any[]; image?: string; video?: string; videoMimeType?: string }[]
   sessions?: Session[]
 }
 
@@ -169,7 +169,9 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
                           </div>
                         )}
                         {step.video && (
-                          <video src={step.video} controls className="w-full mb-4" style={{ maxHeight: '300px' }} />
+                          <video controls className="w-full mb-4" style={{ maxHeight: '300px' }}>
+                            <source src={step.video} type={step.videoMimeType || 'video/mp4'} />
+                          </video>
                         )}
                         {step.title && (
                           <h3 className="font-serif text-xl text-navy mb-2">{step.title}</h3>
