@@ -22,7 +22,7 @@ export type WorkshopDetail = {
   duration: string
   maxSpots: number
   includes?: string[]
-  steps?: { title?: string; text?: any[]; image?: string; video?: string; videoMimeType?: string }[]
+  steps?: { title?: string; text?: any[]; image?: string; video?: string; videoExtension?: string }[]
   sessions?: Session[]
 }
 
@@ -160,7 +160,10 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
                 <h2 className="font-serif text-3xl text-navy mb-8">Програма</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   {steps.map((s, i) => {
-                    const step = typeof s === 'string' ? { title: s, text: undefined, image: undefined, video: undefined } : s
+                    const step = typeof s === 'string' ? { title: s, text: undefined, image: undefined, video: undefined, videoExtension: undefined } : s
+                    const videoUrl = step.video && step.videoExtension && !step.video.includes('.' + step.videoExtension)
+                      ? step.video + '.' + step.videoExtension
+                      : step.video
                     return (
                       <div key={i} className="flex flex-col">
                         {step.image && !step.video && (
@@ -168,9 +171,9 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
                             <Image src={step.image} alt={step.title || ''} fill className="object-cover" />
                           </div>
                         )}
-                        {step.video && (
+                        {videoUrl && (
                           <video controls className="w-full mb-4" style={{ maxHeight: '300px' }}>
-                            <source src={step.video} type={step.videoMimeType || 'video/mp4'} />
+                            <source src={videoUrl} type="video/mp4" />
                           </video>
                         )}
                         {step.title && (
