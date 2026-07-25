@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { PortableText } from '@portabletext/react'
@@ -24,6 +24,59 @@ export type WorkshopDetail = {
   includes?: string[]
   steps?: { title?: string; text?: any[]; image?: string; video?: string; videoExtension?: string }[]
   sessions?: Session[]
+}
+
+type StepData = { title?: string; text?: any[]; image?: string; video?: string; videoExtension?: string }
+
+function StepCard({ step, videoUrl }: { step: StepData; videoUrl?: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  const handleMouseEnter = () => {
+    videoRef.current?.play()
+  }
+  const handleMouseLeave = () => {
+    const v = videoRef.current
+    if (v) { v.pause(); v.currentTime = 0 }
+  }
+
+  return (
+    <div className="flex flex-col">
+      {step.image && !videoUrl && (
+        <div className="relative aspect-square overflow-hidden mb-4">
+          <Image src={step.image} alt={step.title || ''} fill className="object-cover" />
+        </div>
+      )}
+      {videoUrl && (
+        <div
+          className="relative aspect-square overflow-hidden mb-4 bg-black cursor-pointer"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <video
+            ref={videoRef}
+            muted
+            playsInline
+            loop
+            preload="metadata"
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source src={videoUrl} type="video/mp4" />
+          </video>
+        </div>
+      )}
+      {step.title && (
+        <h3 className="font-serif text-xl text-navy mb-2">{step.title}</h3>
+      )}
+      {step.text && Array.isArray(step.text) && (
+        <div className="font-sans text-sm text-navy/60 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1 [&_strong]:font-semibold [&_em]:italic">
+          <PortableText value={step.text} />
+        </div>
+      )}
+      {step.text && typeof step.text === 'string' && (
+        <p className="font-sans text-sm text-navy/60 leading-relaxed whitespace-pre-line">{step.text}</p>
+      )}
+    </div>
+  )
 }
 
 function formatDate(dateStr: string) {
@@ -160,36 +213,12 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
                 <h2 className="font-serif text-3xl text-navy mb-8">Програма</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   {steps.map((s, i) => {
-                    const step = typeof s === 'string' ? { title: s, text: undefined, image: undefined, video: undefined, videoExtension: undefined } : s
-                    const videoUrl = step.video && step.videoExtension && !step.video.includes('.' + step.videoExtension)
-                      ? step.video + '.' + step.videoExtension
-                      : step.video
+                    const stepObj = typeof s === 'string' ? { title: s, text: undefined, image: undefined, video: undefined, videoExtension: undefined } : s
+                    const videoUrl = stepObj.video && stepObj.videoExtension && !stepObj.video.includes('.' + stepObj.videoExtension)
+                      ? stepObj.video + '.' + stepObj.videoExtension
+                      : stepObj.video
                     return (
-                      <div key={i} className="flex flex-col">
-                        {step.image && !step.video && (
-                          <div className="relative aspect-[4/3] overflow-hidden mb-4">
-                            <Image src={step.image} alt={step.title || ''} fill className="object-cover" />
-                          </div>
-                        )}
-                        {videoUrl && (
-                          <div className="relative aspect-square overflow-hidden mb-4 bg-black">
-                            <video controls className="absolute inset-0 w-full h-full object-cover">
-                              <source src={videoUrl} type="video/mp4" />
-                            </video>
-                          </div>
-                        )}
-                        {step.title && (
-                          <h3 className="font-serif text-xl text-navy mb-2">{step.title}</h3>
-                        )}
-                        {step.text && Array.isArray(step.text) && (
-                          <div className="font-sans text-sm text-navy/60 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1 [&_strong]:font-semibold [&_em]:italic">
-                            <PortableText value={step.text} />
-                          </div>
-                        )}
-                        {step.text && typeof step.text === 'string' && (
-                          <p className="font-sans text-sm text-navy/60 leading-relaxed whitespace-pre-line">{step.text}</p>
-                        )}
-                      </div>
+                      <StepCard key={i} step={stepObj} videoUrl={videoUrl} />
                     )
                   })}
                 </div>
