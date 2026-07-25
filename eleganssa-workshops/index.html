@@ -25,9 +25,9 @@ src="https://www.facebook.com/tr?id=1925358761457707&ev=PageView&noscript=1"
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:ital@1&family=Lato:wght@400;700&display=swap');
 :root{
   --bg:#f5efe8; --dark:#2c3e50;
-  --accent-jes:#3A5068; --accent-can:#9a543d; --gold:#c8a86b;
-  --card-jes:#6f7165; --card-can:#7a6355;
-  --card-light-jes:#cbbfb6; --card-light-can:#e8d8cc; --cream:#fdf6ee;
+  --accent-jes:#3A5068; --accent-can:#9a543d; --accent-alb:#3d4a34; --gold:#c8a86b;
+  --card-jes:#6f7165; --card-can:#7a6355; --card-alb:#4a5940;
+  --card-light-jes:#cbbfb6; --card-light-can:#e8d8cc; --card-light-alb:#d7ddc9; --cream:#fdf6ee;
 }
 *{ box-sizing:border-box; }
 body{ margin:0; background:var(--bg); color:var(--dark); font-family:Lato,sans-serif; }
@@ -73,9 +73,11 @@ nav .nav-links{ display:flex; gap:24px; }
 .workshop-divider{ text-align:center; padding:50px 25px 20px; border-top:3px solid; }
 .workshop-divider.jes{ border-color:var(--accent-jes); }
 .workshop-divider.can{ border-color:var(--accent-can); }
+.workshop-divider.alb{ border-color:var(--accent-alb); }
 .workshop-badge{ display:inline-block; color:var(--cream); font-weight:700; font-size:12px; letter-spacing:2px; padding:7px 18px; border-radius:20px; margin-bottom:14px; }
 .badge-jes{ background:var(--accent-jes); }
 .badge-can{ background:var(--accent-can); }
+.badge-alb{ background:var(--accent-alb); }
 .workshop-divider h2{ font-family:"Playfair Display",serif; font-size:40px; margin:0 0 6px; color:var(--dark); }
 .workshop-divider p{ font-family:Lora,serif; font-style:italic; font-size:19px; margin:0; color:var(--dark); }
 
@@ -92,8 +94,11 @@ h2{ font-family:"Playfair Display",serif; font-size:32px; margin-top:60px; color
 .card-dark-jes p{ color:var(--cream); }
 .card-dark-can{ background:var(--card-can); color:var(--cream); border-radius:22px; padding:35px; margin-top:30px; box-shadow:0 10px 30px rgba(0,0,0,.12); }
 .card-dark-can p{ color:var(--cream); }
+.card-dark-alb{ background:var(--card-alb); color:var(--cream); border-radius:22px; padding:35px; margin-top:30px; box-shadow:0 10px 30px rgba(0,0,0,.12); }
+.card-dark-alb p{ color:var(--cream); }
 .card-light-jes{ background:var(--card-light-jes); border-radius:22px; }
 .card-light-can{ background:var(--card-light-can); border-radius:22px; }
+.card-light-alb{ background:var(--card-light-alb); border-radius:22px; }
 
 .grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:30px; align-items:start; }
 @media(max-width:900px){ .grid{ grid-template-columns:repeat(2,1fr); } }
@@ -123,10 +128,12 @@ h2{ font-family:"Playfair Display",serif; font-size:32px; margin-top:60px; color
 
 .schedule-card-jes{ background:var(--card-jes); color:var(--cream); border-radius:22px; padding:30px; box-shadow:0 8px 24px rgba(0,0,0,.12); }
 .schedule-card-can{ background:var(--card-can); color:var(--cream); border-radius:22px; padding:30px; box-shadow:0 8px 24px rgba(0,0,0,.12); }
-.schedule-card-jes h3,.schedule-card-can h3{ color:var(--cream); margin-top:0; font-family:"Playfair Display",serif; font-size:21px; }
-.schedule-card-jes p,.schedule-card-can p{ color:var(--cream); margin:5px 0; }
+.schedule-card-alb{ background:var(--card-alb); color:var(--cream); border-radius:22px; padding:30px; box-shadow:0 8px 24px rgba(0,0,0,.12); }
+.schedule-card-jes h3,.schedule-card-can h3,.schedule-card-alb h3{ color:var(--cream); margin-top:0; font-family:"Playfair Display",serif; font-size:21px; }
+.schedule-card-jes p,.schedule-card-can p,.schedule-card-alb p{ color:var(--cream); margin:5px 0; }
 .btn-jes{ display:inline-block; background:var(--cream); color:var(--card-jes); font-weight:700; padding:13px 28px; border-radius:40px; text-decoration:none; margin-top:16px; font-size:14px; }
 .btn-can{ display:inline-block; background:var(--cream); color:var(--card-can); font-weight:700; padding:13px 28px; border-radius:40px; text-decoration:none; margin-top:16px; font-size:14px; }
+.btn-alb{ display:inline-block; background:var(--cream); color:var(--card-alb); font-weight:700; padding:13px 28px; border-radius:40px; text-decoration:none; margin-top:16px; font-size:14px; }
 .spots{ font-size:12px; color:rgba(253,246,238,.65); margin-top:6px; }
 
 .intro-icons{ display:flex; justify-content:center; gap:30px; flex-wrap:wrap; margin-top:22px; padding-top:20px; border-top:1px solid rgba(253,246,238,.25); }
@@ -139,20 +146,25 @@ li{ margin:14px 0; font-size:17px; text-align:left; }
 
 .review-jes{ background:var(--card-jes); color:var(--cream); border-radius:20px; padding:25px; }
 .review-can{ background:var(--card-can); color:var(--cream); border-radius:20px; padding:25px; }
-.review-jes p,.review-jes b,.review-can p,.review-can b{ color:var(--cream); }
+.review-alb{ background:var(--card-alb); color:var(--cream); border-radius:20px; padding:25px; }
+.review-jes p,.review-jes b,.review-can p,.review-can b,.review-alb p,.review-alb b{ color:var(--cream); }
 .stars-jes{ color:var(--gold); font-size:17px; margin-bottom:7px; }
 .stars-can{ color:var(--gold); font-size:17px; margin-bottom:7px; }
+.stars-alb{ color:var(--gold); font-size:17px; margin-bottom:7px; }
 
 .faq-jes{ background:var(--card-jes); color:var(--cream); border-radius:22px; padding:35px; margin-top:30px; }
 .faq-can{ background:var(--card-can); color:var(--cream); border-radius:22px; padding:35px; margin-top:30px; }
-.faq-jes p,.faq-jes b,.faq-can p,.faq-can b{ color:var(--cream); }
+.faq-alb{ background:var(--card-alb); color:var(--cream); border-radius:22px; padding:35px; margin-top:30px; }
+.faq-jes p,.faq-jes b,.faq-can p,.faq-can b,.faq-alb p,.faq-alb b{ color:var(--cream); }
 
 .cta-jes{ background:var(--accent-jes); color:var(--cream); padding:45px; border-radius:22px; text-align:center; }
 .cta-can{ background:var(--accent-can); color:var(--cream); padding:45px; border-radius:22px; text-align:center; }
-.cta-jes h2,.cta-can h2{ color:var(--cream); margin-top:0; font-size:28px; }
+.cta-alb{ background:var(--accent-alb); color:var(--cream); padding:45px; border-radius:22px; text-align:center; }
+.cta-jes h2,.cta-can h2,.cta-alb h2{ color:var(--cream); margin-top:0; font-size:28px; }
 .cta-btns{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:18px; }
 .cta-solid-jes{ display:inline-block; background:var(--cream); color:var(--accent-jes); font-weight:700; padding:13px 28px; border-radius:40px; text-decoration:none; font-size:14px; }
 .cta-solid-can{ display:inline-block; background:var(--cream); color:var(--accent-can); font-weight:700; padding:13px 28px; border-radius:40px; text-decoration:none; font-size:14px; }
+.cta-solid-alb{ display:inline-block; background:var(--cream); color:var(--accent-alb); font-weight:700; padding:13px 28px; border-radius:40px; text-decoration:none; font-size:14px; }
 .cta-outline{ display:inline-block; background:transparent; color:var(--cream); font-weight:700; padding:13px 28px; border-radius:40px; text-decoration:none; font-size:14px; border:2px solid var(--cream); }
 
 .section-bg-jes{ background:#eeeae6; }
@@ -281,8 +293,10 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
   <div class="nav-links">
     <a href="#jesmonite">Jesmonite</a>
     <a href="#sveshti">Соева свещ</a>
+    <a href="#albums">Какво говорят ръцете ти?</a>
     <a href="#schedule-jes">Записване Jesmonite</a>
     <a href="#schedule-can">Записване Свещ</a>
+    <a href="#schedule-alb">Записване Албум</a>
     <a href="voucher.html" style="color:var(--gold);">Ваучер</a>
     <a href="about.html" style="color:var(--gold);">За нас</a>
     <a href="contact.html" style="color:var(--gold);">Контакти</a>
@@ -297,8 +311,10 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
   <button id="mobileCloseBtn" onclick="document.getElementById('mobileOverlay').style.display='none'">✕</button>
   <a href="#jesmonite" onclick="document.getElementById('mobileOverlay').style.display='none'">Jesmonite</a>
   <a href="#sveshti" onclick="document.getElementById('mobileOverlay').style.display='none'">Соева свещ</a>
+  <a href="#albums" onclick="document.getElementById('mobileOverlay').style.display='none'">Какво говорят ръцете ти?</a>
   <a href="#schedule-jes" onclick="document.getElementById('mobileOverlay').style.display='none'">Записване Jesmonite</a>
   <a href="#schedule-can" onclick="document.getElementById('mobileOverlay').style.display='none'">Записване Свещ</a>
+  <a href="#schedule-alb" onclick="document.getElementById('mobileOverlay').style.display='none'">Записване Албум</a>
   <a href="about.html" onclick="document.getElementById('mobileOverlay').style.display='none'">За нас</a>
   <a href="contact.html" onclick="document.getElementById('mobileOverlay').style.display='none'">Контакти</a>
 </div>
@@ -310,6 +326,7 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
   <div class="hero-btns">
     <a class="hero-btn-jes" href="#schedule-jes">Запази място за Jesmonite →</a>
     <a class="hero-btn-can" href="#schedule-can">Запази място за Соева свещ →</a>
+    <a class="hero-btn-jes" style="background:var(--accent-alb);" href="#schedule-alb">Запази място за Албум →</a>
   </div>
 </div>
 
@@ -622,6 +639,76 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
   </section>
 </div>
 
+<!-- КАКВО ГОВОРЯТ РЪЦЕТЕ ТИ -->
+<div id="albums" style="background:#efecf2;">
+  <div class="workshop-divider alb">
+    <h2>Какво говорят ръцете ти?</h2>
+    <p>Творчество, интуиция и малко психология</p>
+  </div>
+  <section class="container intro">
+    <div class="card-dark-alb" style="text-align:center;">
+      <p style="font-size:18px;font-family:'Playfair Display',serif;">Работилница, каквато не сме правили досега.</p>
+      <p style="font-size:16px;line-height:1.8;">Украсяваш корицата на личен албум - с хартия, сухи цветя, дантела и цветове по собствен избор.<br>Без строги инструкции. Без правила. Само следваш ръцете си.<br>Изборите, които правиш интуитивно - цветовете, текстурите, симетрията или хаосът - разказват нещо за теб. Точно това нашият партньор психолог наблюдава, а накрая споделя какво е видял.</p>
+      <div class="intro-icons">
+        <div class="intro-icon-item"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span>За начинаещи</span></div>
+        <div class="intro-icon-item"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><span>Материали<br>включени</span></div>
+        <div class="intro-icon-item"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Сам или<br>с приятел</span></div>
+        <div class="intro-icon-item"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg><span>Кафе<br>+ закуска</span></div>
+      </div>
+    </div>
+  </section>
+  <section class="container" id="schedule-alb">
+    <h2>ГРАФИК И ЗАПИСВАНЕ</h2>
+    <div class="grid">
+      <div class="schedule-card-alb">
+        <h3>10 август | 18:00</h3>
+        <p>Варна, ул. Бреза 2</p>
+        <p>Продължителност: ~2 часа</p>
+        <p class="spots">Максимум 6 участника</p>
+        <a class="btn-alb" href="zapis.html?workshop=albums-10avgust">
+          Запази място — капаро 20 €
+        </a>
+        <p style="font-size:11px;opacity:.7;margin-top:8px;">Капарото е 20 €. Остатъкът от 19 € се заплаща на място.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container" style="text-align:left;">
+    <h2>7 НЕЩА ПРЕДИ ДА ДОЙДЕШ</h2>
+    <ul>
+      <li>✦ Не ти трябва опит - подходящо е за всеки</li>
+      <li>✦ Всички материали са включени - хартия, цветя, дантела, лепило, детайли</li>
+      <li>✦ Сам избираш цветовете и текстурите</li>
+      <li>✦ Взимаш готовия албум със себе си същия ден</li>
+      <li>✦ Серьозно, но не тежко - повече като малко огледало</li>
+      <li>✦ Партньор психолог споделя наблюденията си накрая</li>
+      <li>✦ Идеален начин да прекараш време със себе си или с приятел</li>
+    </ul>
+  </section>
+
+  <section class="container">
+    <h2>ЧЕСТИ ВЪПРОСИ</h2>
+    <div class="faq-alb">
+      <p><b>Трябва ли ми опит в декорирането?</b><br>Не - няма строги инструкции и правила, следваш собствената си интуиция. Ние подпомагаме с наши знания, трупани много години.</p>
+      <p><b>Какво е включено в цената?</b><br>Всички материали - хартия, сухи цветя, дантела, лепило, детайли; готов албум с украсена корица; кафе, чай и лека закуска; разговор с партньор психолог.</p>
+      <p><b>Как работи частта с психолога?</b><br>Изборите, които правиш интуитивно по време на украсата, се наблюдават от партньор психолог, който накрая споделя какво е видял - индивидуално или групово.</p>
+      <p><b>Колко участника има?</b><br>Максимум 6 човека за лично внимание към всеки.</p>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="cta-alb">
+      <h2>ЗАПИШИ СЕ ЗА "КАКВО ГОВОРЯТ РЪЦЕТЕ ТИ?"</h2>
+      <p>Групата е малка и местата се запълват бързо.</p>
+      <p style="font-size:14px;opacity:.8;margin-bottom:4px;">Капаро 20 € сега + 19 € на място при работилницата.</p>
+      <div class="cta-btns">
+        <a class="cta-solid-alb" href="zapis.html?workshop=albums-10avgust">10 август | 18:00 — 20 €</a>
+      </div>
+      <p style="margin-top:18px;font-size:13px;opacity:.8;">Варна, ул. Бреза 2 | 0885 442 821 | eleganssastudio@gmail.com</p>
+    </div>
+  </section>
+</div>
+
 <!-- ПОДАРЪЧЕН ВАУЧЕР -->
 <div class="voucher-section">
   <div class="voucher-inner">
@@ -648,7 +735,8 @@ footer{ background:#2c3e50; color:var(--cream); padding:28px; text-align:center;
   var fired = {};
   var sections = [
     { id: 'jesmonite', name: 'Jesmonite декор', value: 39.00 },
-    { id: 'sveshti',   name: 'Соева свещ',     value: 39.00 }
+    { id: 'sveshti',   name: 'Соева свещ',     value: 39.00 },
+    { id: 'albums',    name: 'Какво говорят ръцете ти?', value: 39.00 }
   ];
   if ('IntersectionObserver' in window) {
     var obs = new IntersectionObserver(function(entries){
