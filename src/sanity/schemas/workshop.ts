@@ -23,8 +23,9 @@ export default defineType({
         name: 'step',
         title: 'Стъпка',
         fields: [
-          { name: 'text', title: 'Описание', type: 'string', validation: (r: any) => r.required() },
+          { name: 'text', title: 'Описание', type: 'text', rows: 4, validation: (r: any) => r.required() },
           { name: 'image', title: 'Снимка (по избор)', type: 'image', options: { hotspot: true } },
+          { name: 'video', title: 'Видео (по избор)', type: 'file', options: { accept: 'video/*' } },
         ],
         preview: {
           select: { title: 'text', media: 'image' },

@@ -21,7 +21,7 @@ export type WorkshopDetail = {
   duration: string
   maxSpots: number
   includes?: string[]
-  steps?: { text: string; image?: string }[]
+  steps?: { text: string; image?: string; video?: string }[]
   sessions?: Session[]
 }
 
@@ -164,11 +164,19 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
                         {i + 1}
                       </div>
                       <div className="flex-1">
-                        <p className="font-sans text-navy/70 pt-1">{typeof s === 'string' ? s : s.text}</p>
-                        {typeof s !== 'string' && s.image && (
+                        <p className="font-sans text-navy/70 pt-1 whitespace-pre-line">{typeof s === 'string' ? s : s.text}</p>
+                        {typeof s !== 'string' && s.image && !s.video && (
                           <div className="relative mt-3 aspect-video overflow-hidden rounded">
                             <Image src={s.image} alt={s.text} fill className="object-cover" />
                           </div>
+                        )}
+                        {typeof s !== 'string' && s.video && (
+                          <video
+                            src={s.video}
+                            controls
+                            className="mt-3 w-full rounded"
+                            style={{ maxHeight: '400px' }}
+                          />
                         )}
                       </div>
                     </div>
