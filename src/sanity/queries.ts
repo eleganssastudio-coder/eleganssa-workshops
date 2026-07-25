@@ -151,6 +151,31 @@ export const homepageQuery = groq`
   }
 `
 
+export const workshopsPageQuery = groq`
+  *[_type == "workshopsPage"][0] {
+    heroLabel,
+    heroTitle,
+    heroText,
+    benefits,
+    privateLabel,
+    privateTitle,
+    privateText,
+    privateBullets,
+    "privateImage": privateImage.asset->url,
+    privateBtnLabel,
+    privateBtnEmail
+  }
+`
+
+export const legalPageQuery = groq`
+  *[_type == "legalPage" && slug == $slug][0] {
+    title,
+    subtitle,
+    body,
+    lastUpdated
+  }
+`
+
 export const aboutQuery = groq`
   *[_type == "about"][0] {
     heroTitle,

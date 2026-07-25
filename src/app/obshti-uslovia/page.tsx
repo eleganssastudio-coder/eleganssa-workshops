@@ -1,69 +1,42 @@
 import type { Metadata } from 'next'
+import { client } from '@/sanity/client'
+import { legalPageQuery } from '@/sanity/queries'
+import { PortableText } from '@portabletext/react'
+
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Общи условия',
 }
 
-export default function ObshtiUsloviaPage() {
+const FALLBACK_BODY = [
+  { _type: 'block', _key: '1', style: 'h2', children: [{ _type: 'span', text: '1. Общи разпоредби' }] },
+  { _type: 'block', _key: '2', style: 'normal', children: [{ _type: 'span', text: 'Настоящите общи условия уреждат отношенията между Eleganssa Studio (Продавач) и потребителите на онлайн магазина (Купувач).' }] },
+]
+
+export default async function ObshtiUsloviaPage() {
+  let page: any = null
+  try {
+    if (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
+      page = await client.fetch(legalPageQuery, { slug: 'obshti-uslovia' })
+    }
+  } catch (_) {}
+
+  const title = page?.title ?? 'Общи условия'
+  const subtitle = page?.subtitle ?? 'Правна информация'
+  const body = page?.body ?? FALLBACK_BODY
+  const lastUpdated = page?.lastUpdated ?? 'Декември 2024'
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
       <div className="mb-12">
-        <p className="section-subtitle">Правна информация</p>
-        <h1 className="font-serif text-5xl text-navy">Общи условия</h1>
+        <p className="section-subtitle">{subtitle}</p>
+        <h1 className="font-serif text-5xl text-navy">{title}</h1>
         <div className="w-16 h-px bg-sage mt-4" />
       </div>
-
-      <div className="font-sans text-navy/70 space-y-8 leading-relaxed">
-        <section>
-          <h2 className="font-serif text-2xl text-navy mb-4">1. Общи разпоредби</h2>
-          <p>
-            Настоящите общи условия уреждат отношенията между Eleganssa Studio (Продавач) и потребителите на онлайн магазина eleganssastudio.com (Купувач).
-          </p>
-        </section>
-
-        <section>
-          <h2 className="font-serif text-2xl text-navy mb-4">2. Продукти и услуги</h2>
-          <p>
-            Eleganssa Studio предлага ръчно изработени соеви свещи, Jesmonite изделия и подаръчни комплекти, както и творчески работилници. Всички продукти са изработени ръчно и могат да се различават леко от снимките.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="font-serif text-2xl text-navy mb-4">3. Поръчки</h2>
-          <p>
-            Поръчките се обработват в рамките на 1-2 работни дни. Приемаме поръчки онлайн чрез нашия сайт. Потвърждение за поръчката се изпраща на посочения имейл адрес.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="font-serif text-2xl text-navy mb-4">4. Цени и плащане</h2>
-          <p>
-            Всички цени са в евро и включват ДДС. Приемаме плащания с банкови карти чрез Stripe. При технически проблем с плащането, не се задържат средства от вашата сметка.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="font-serif text-2xl text-navy mb-4">5. Доставка</h2>
-          <p>
-            Доставките се извършват в рамките на България. Срок на доставка: 3-5 работни дни. Безплатна доставка при поръчки над 100 €. При поръчки под 100 € - 7 € за доставка.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="font-serif text-2xl text-navy mb-4">6. Работилници</h2>
-          <p>
-            Резервациите за работилници са обвързващи. При отказ до 48 часа преди събитието - пълно възстановяване. При по-кратък срок - 50% такса. При отмяна от наша страна - пълно възстановяване.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="font-serif text-2xl text-navy mb-4">7. Приложимо право</h2>
-          <p>
-            Настоящите условия се уреждат от законодателството на Република България. За неуредени въпроси се прилага Законът за защита на потребителите.
-          </p>
-        </section>
-
-        <p className="text-sm text-navy/40">Последна актуализация: Декември 2024</p>
+      <div className="font-sans text-navy/70 space-y-4 leading-relaxed [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:text-navy [&_h2]:mb-2 [&_h2]:mt-8 [&_h3]:font-serif [&_h3]:text-xl [&_h3]:text-navy [&_h3]:mb-2 [&_h3]:mt-6 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1 [&_strong]:font-semibold [&_em]:italic">
+        <PortableText value={body} />
+        <p className="text-sm text-navy/40 pt-4">Последна актуализация: {lastUpdated}</p>
       </div>
     </div>
   )
