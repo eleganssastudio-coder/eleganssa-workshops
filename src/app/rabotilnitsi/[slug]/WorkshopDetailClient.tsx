@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { PortableText } from '@portabletext/react'
 import { Clock, Users, CheckCircle, ChevronRight, Calendar, Minus, Plus, CreditCard, Banknote } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import toast from 'react-hot-toast'
@@ -21,7 +22,7 @@ export type WorkshopDetail = {
   duration: string
   maxSpots: number
   includes?: string[]
-  steps?: { title?: string; text?: string; image?: string; video?: string }[]
+  steps?: { title?: string; text?: any[]; image?: string; video?: string }[]
   sessions?: Session[]
 }
 
@@ -173,7 +174,12 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
                         {step.title && (
                           <h3 className="font-serif text-xl text-navy mb-2">{step.title}</h3>
                         )}
-                        {step.text && (
+                        {step.text && Array.isArray(step.text) && (
+                          <div className="font-sans text-sm text-navy/60 leading-relaxed [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1 [&_strong]:font-semibold [&_em]:italic">
+                            <PortableText value={step.text} />
+                          </div>
+                        )}
+                        {step.text && typeof step.text === 'string' && (
                           <p className="font-sans text-sm text-navy/60 leading-relaxed whitespace-pre-line">{step.text}</p>
                         )}
                       </div>

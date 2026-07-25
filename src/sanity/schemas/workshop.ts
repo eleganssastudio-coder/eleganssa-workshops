@@ -24,7 +24,7 @@ export default defineType({
         title: 'Стъпка',
         fields: [
           { name: 'title', title: 'Заглавие', type: 'string', validation: (r: any) => r.required() },
-          { name: 'text', title: 'Описание', type: 'text', rows: 4 },
+          { name: 'text', title: 'Описание', type: 'array', of: [{ type: 'block', styles: [{ title: 'Normal', value: 'normal' }], lists: [{ title: 'Булети', value: 'bullet' }, { title: 'Номерирани', value: 'number' }], marks: { decorators: [{ title: 'Bold', value: 'strong' }, { title: 'Italic', value: 'em' }] } }] },
           { name: 'image', title: 'Снимка (по избор)', type: 'image', options: { hotspot: true } },
           { name: 'video', title: 'Видео (по избор)', type: 'file', options: { accept: 'video/*' } },
         ],
