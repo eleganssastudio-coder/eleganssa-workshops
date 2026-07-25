@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Search, Heart, ShoppingBag, User, Menu, X } from 'lucide-react'
+import { Search, Heart, ShoppingBag, Menu, X } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { useWishlistStore } from '@/store/wishlistStore'
 import { cn } from '@/lib/utils'
@@ -70,7 +70,7 @@ export default function Header() {
                 <Search className="w-5 h-5" />
               </Link>
               <Link
-                href="/profil"
+                href="/wishlist"
                 className="relative p-2 text-navy hover:text-sage transition-colors rounded-full hover:bg-cream"
                 aria-label="Любими"
               >
@@ -93,14 +93,6 @@ export default function Header() {
                   </span>
                 )}
               </button>
-              <Link
-                href="/profil"
-                className="p-2 text-navy hover:text-sage transition-colors rounded-full hover:bg-cream hidden md:flex"
-                aria-label="Профил"
-              >
-                <User className="w-5 h-5" />
-              </Link>
-
               {/* Mobile menu button */}
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
@@ -127,16 +119,6 @@ export default function Header() {
                   {link.label}
                 </Link>
               ))}
-              <div className="pt-4 border-t border-cream">
-                <Link
-                  href="/profil"
-                  onClick={() => setMobileOpen(false)}
-                  className="font-sans text-sm text-navy/60 hover:text-navy transition-colors flex items-center gap-2"
-                >
-                  <User className="w-4 h-4" />
-                  Моят профил
-                </Link>
-              </div>
             </nav>
           </div>
         )}
