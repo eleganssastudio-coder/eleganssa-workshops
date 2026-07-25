@@ -5,5 +5,7 @@ import category from './category'
 import homepage from './homepage'
 import about from './about'
 import voucher from './voucher'
+import workshopsPage from './workshopsPage'
+import legalPage from './legalPage'
 
-export const schemaTypes = [product, workshop, review, category, homepage, about, voucher]
+export const schemaTypes = [product, workshop, review, category, homepage, about, voucher, workshopsPage, legalPage]
