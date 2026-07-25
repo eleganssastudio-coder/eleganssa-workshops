@@ -21,7 +21,7 @@ export type WorkshopDetail = {
   duration: string
   maxSpots: number
   includes?: string[]
-  steps?: { text: string; image?: string; video?: string }[]
+  steps?: { title?: string; text?: string; image?: string; video?: string }[]
   sessions?: Session[]
 }
 
@@ -156,31 +156,29 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
 
             {steps.length > 0 && (
               <div className="mb-12">
-                <h2 className="font-serif text-3xl text-navy mb-6">Програма</h2>
-                <div className="space-y-6">
-                  {steps.map((s, i) => (
-                    <div key={i} className="flex gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-navy text-cream flex items-center justify-center font-serif text-sm">
-                        {i + 1}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-sans text-navy/70 pt-1 whitespace-pre-line">{typeof s === 'string' ? s : s.text}</p>
-                        {typeof s !== 'string' && s.image && !s.video && (
-                          <div className="relative mt-3 aspect-video overflow-hidden rounded">
-                            <Image src={s.image} alt={s.text} fill className="object-cover" />
+                <h2 className="font-serif text-3xl text-navy mb-8">Програма</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  {steps.map((s, i) => {
+                    const step = typeof s === 'string' ? { title: s, text: undefined, image: undefined, video: undefined } : s
+                    return (
+                      <div key={i} className="flex flex-col">
+                        {step.image && !step.video && (
+                          <div className="relative aspect-[4/3] overflow-hidden mb-4">
+                            <Image src={step.image} alt={step.title || ''} fill className="object-cover" />
                           </div>
                         )}
-                        {typeof s !== 'string' && s.video && (
-                          <video
-                            src={s.video}
-                            controls
-                            className="mt-3 w-full rounded"
-                            style={{ maxHeight: '400px' }}
-                          />
+                        {step.video && (
+                          <video src={step.video} controls className="w-full mb-4" style={{ maxHeight: '300px' }} />
+                        )}
+                        {step.title && (
+                          <h3 className="font-serif text-xl text-navy mb-2">{step.title}</h3>
+                        )}
+                        {step.text && (
+                          <p className="font-sans text-sm text-navy/60 leading-relaxed whitespace-pre-line">{step.text}</p>
                         )}
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             )}
