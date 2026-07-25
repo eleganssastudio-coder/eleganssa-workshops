@@ -172,9 +172,11 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
                           </div>
                         )}
                         {videoUrl && (
-                          <video controls className="w-full mb-4" style={{ maxHeight: '300px' }}>
-                            <source src={videoUrl} type="video/mp4" />
-                          </video>
+                          <div className="relative aspect-square overflow-hidden mb-4 bg-black">
+                            <video controls className="absolute inset-0 w-full h-full object-cover">
+                              <source src={videoUrl} type="video/mp4" />
+                            </video>
+                          </div>
                         )}
                         {step.title && (
                           <h3 className="font-serif text-xl text-navy mb-2">{step.title}</h3>
