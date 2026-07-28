@@ -64,7 +64,6 @@ export default function BoxNowPicker({ onSelect, onClose }: Props) {
             style={{ border: 'none', flex: 1, minHeight: '500px', display: 'block' }}
             title="BoxNow Locker Map"
             allow="geolocation"
-            onError={openPopup}
           />
         </div>
         <div className="px-6 py-3 border-t border-navy/10 flex-shrink-0 text-center">
