@@ -13,14 +13,13 @@ async function getToken(): Promise<string> {
     throw new Error('BoxNow credentials not configured (BOXNOW_CLIENT_ID / BOXNOW_CLIENT_SECRET missing)')
   }
 
-  // Try OAuth2 standard endpoint first
-  const res = await fetch(`${API_URL}/v1/oauth/token`, {
+  const res = await fetch(`${API_URL}/api/v1/partners/token`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      clientId: CLIENT_ID,
+      clientSecret: CLIENT_SECRET,
+      grantType: 'client_credentials',
     }),
   })
 
@@ -53,7 +52,7 @@ export interface BoxNowLocker {
 
 export async function getLockers(): Promise<BoxNowLocker[]> {
   const token = await getToken()
-  const res = await fetch(`${API_URL}/v1/delivery-points`, {
+  const res = await fetch(`${API_URL}/api/v1/delivery-points`, {
     headers: { Authorization: `Bearer ${token}` },
     next: { revalidate: 3600 },
   })
@@ -87,7 +86,7 @@ export async function createParcel(params: {
 }): Promise<{ id?: string; trackingNumber?: string; error?: string }> {
   try {
     const token = await getToken()
-    const res = await fetch(`${API_URL}/v1/parcels`, {
+    const res = await fetch(`${API_URL}/api/v1/parcels`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
