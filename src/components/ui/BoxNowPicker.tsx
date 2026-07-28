@@ -8,8 +8,7 @@ const PARTNER_ID = 15925
 
 declare global {
   interface Window {
-    _bn_map_widget_config: any
-    boxnowWidgetReady?: boolean
+    bn_map_widget_config: any
   }
 }
 
@@ -23,9 +22,11 @@ export default function BoxNowPicker({ onSelect, onClose }: Props) {
   const buttonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    window._bn_map_widget_config = {
+    window.bn_map_widget_config = {
       partnerId: PARTNER_ID,
       parentElement: '#boxnowmap',
+      autoclose: true,
+      autoselect: false,
       afterSelect: (selected: any) => {
         onSelect({
           id: String(selected.boxnowLockerId ?? ''),
@@ -39,10 +40,8 @@ export default function BoxNowPicker({ onSelect, onClose }: Props) {
     }
   }, [onSelect, onClose])
 
-  // When script becomes ready, click the hidden trigger so widget initialises
   useEffect(() => {
     if (scriptReady && buttonRef.current) {
-      // small delay to let the widget script attach its handlers
       setTimeout(() => buttonRef.current?.click(), 200)
     }
   }, [scriptReady])
@@ -59,10 +58,9 @@ export default function BoxNowPicker({ onSelect, onClose }: Props) {
           {!scriptReady && (
             <p className="text-center font-sans text-sm text-navy/50 py-4">Зарежда...</p>
           )}
-          {/* BoxNow requires an element with this class to open the widget */}
           <button
             ref={buttonRef}
-            className="boxnow-widget-button btn-primary w-full text-center"
+            className="boxnow-map-widget-button btn-primary w-full text-center"
             style={{ display: scriptReady ? 'block' : 'none' }}
           >
             Отвори картата с автоматите
@@ -72,7 +70,7 @@ export default function BoxNowPicker({ onSelect, onClose }: Props) {
       </div>
 
       <Script
-        src="https://widgetcdn.boxnow.bg/map-widget/client/v5.js"
+        src="https://widget-cdn.boxnow.gr/map-widget/client/v5.js"
         strategy="lazyOnload"
         onReady={() => setScriptReady(true)}
         onLoad={() => setScriptReady(true)}
