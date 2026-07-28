@@ -40,11 +40,6 @@ export default function BoxNowPicker({ onSelect, onClose }: Props) {
     }
   }, [onSelect, onClose])
 
-  useEffect(() => {
-    if (scriptReady && buttonRef.current) {
-      setTimeout(() => buttonRef.current?.click(), 200)
-    }
-  }, [scriptReady])
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4">
@@ -55,15 +50,13 @@ export default function BoxNowPicker({ onSelect, onClose }: Props) {
           <button onClick={onClose} className="p-1 text-navy/40 hover:text-navy transition-colors text-xl leading-none">✕</button>
         </div>
         <div className="p-4">
-          {!scriptReady && (
-            <p className="text-center font-sans text-sm text-navy/50 py-4">Зарежда...</p>
-          )}
+
           <button
             ref={buttonRef}
+            type="button"
             className="boxnow-map-widget-button btn-primary w-full text-center"
-            style={{ display: scriptReady ? 'block' : 'none' }}
           >
-            Отвори картата с автоматите
+            {scriptReady ? 'Отвори картата с автоматите' : 'Зарежда...'}
           </button>
           <div id="boxnowmap" className="w-full mt-4" />
         </div>
