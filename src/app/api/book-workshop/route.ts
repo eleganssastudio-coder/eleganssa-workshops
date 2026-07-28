@@ -98,6 +98,7 @@ async function sendEmail(data: {
   name: string; email: string; phone: string; paymentMethod: string
 }) {
   try {
+    // Email to owner
     await fetch('https://formspree.io/f/mpqgnbbd', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -115,6 +116,30 @@ async function sendEmail(data: {
         'Телефон': data.phone,
       }),
     })
+
+    // Email to client for bank transfer
+    if (data.paymentMethod === 'bank') {
+      await fetch('https://formspree.io/f/mpqgnbbd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          _replyto: 'eleganssastudio@gmail.com',
+          _subject: `Потвърждение за записване — ${data.workshopTitle}`,
+          'До': data.email,
+          'Здравейте': data.name,
+          'Записване №': data.bookingId,
+          'Работилница': data.workshopTitle,
+          'Дата и час': data.sessionInfo,
+          'Брой участници': data.spots,
+          'Капаро за превод': `${data.deposit} €`,
+          'Банкова сметка': 'IBAN: — / BIC: — / Eleganssa Studio (попълнете данните)',
+          'Основание': `Капаро ${data.bookingId}`,
+          'Важно': `Моля преведете капарото от ${data.deposit} € в рамките на 24 часа. При неплащане записването се анулира автоматично и мястото се освобождава.`,
+          'Остатък': `${data.total - data.deposit} € се заплаща на място в деня на работилницата.`,
+          'Въпроси': 'eleganssastudio@gmail.com | @eleganssastudio',
+        }),
+      })
+    }
   } catch (e) {
     console.error('Formspree error:', e)
   }
