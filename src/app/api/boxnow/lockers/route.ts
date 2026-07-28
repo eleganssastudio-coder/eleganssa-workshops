@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getLockers } from '@/lib/boxnow'
 
-export const revalidate = 3600
+export const revalidate = 0
 
 export async function GET() {
   try {
@@ -9,6 +9,6 @@ export async function GET() {
     return NextResponse.json(lockers)
   } catch (e) {
     console.error('BoxNow lockers error:', e)
-    return NextResponse.json([], { status: 200 })
+    return NextResponse.json({ error: String(e) }, { status: 500 })
   }
 }

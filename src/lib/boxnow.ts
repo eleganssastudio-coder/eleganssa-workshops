@@ -9,17 +9,31 @@ let tokenCache: { token: string; expires: number } | null = null
 async function getToken(): Promise<string> {
   if (tokenCache && Date.now() < tokenCache.expires) return tokenCache.token
 
+  if (!CLIENT_ID || !CLIENT_SECRET) {
+    throw new Error('BoxNow credentials not configured (BOXNOW_CLIENT_ID / BOXNOW_CLIENT_SECRET missing)')
+  }
+
+  // Try OAuth2 standard endpoint first
   const res = await fetch(`${API_URL}/v1/oauth/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
       grant_type: 'client_credentials',
-      client_id: CLIENT_ID!,
-      client_secret: CLIENT_SECRET!,
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
     }),
   })
 
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`BoxNow token error ${res.status}: ${text}`)
+  }
+
   const data = await res.json()
+  if (!data.access_token) {
+    throw new Error(`BoxNow token missing in response: ${JSON.stringify(data)}`)
+  }
+
   tokenCache = {
     token: data.access_token,
     expires: Date.now() + ((data.expires_in ?? 3600) - 60) * 1000,
@@ -43,11 +57,16 @@ export async function getLockers(): Promise<BoxNowLocker[]> {
     headers: { Authorization: `Bearer ${token}` },
     next: { revalidate: 3600 },
   })
+
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`BoxNow delivery-points error ${res.status}: ${text}`)
+  }
+
   const data = await res.json()
-  // Normalize response — BoxNow returns array under data or directly
-  const items: any[] = Array.isArray(data) ? data : (data.data ?? data.items ?? [])
+  const items: any[] = Array.isArray(data) ? data : (data.data ?? data.items ?? data.deliveryPoints ?? [])
   return items.map((l: any) => ({
-    id: String(l.id ?? l.delivery_point_id ?? l.lockerId),
+    id: String(l.id ?? l.delivery_point_id ?? l.lockerId ?? ''),
     name: l.name ?? l.title ?? '',
     address: l.address ?? l.street ?? '',
     city: l.city ?? l.town ?? '',
