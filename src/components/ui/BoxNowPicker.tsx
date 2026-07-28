@@ -1,16 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import Script from 'next/script'
+import { useEffect } from 'react'
 import type { BoxNowLocker } from '@/lib/boxnow'
 
 const PARTNER_ID = 15925
-
-declare global {
-  interface Window {
-    bn_map_widget_config: any
-  }
-}
+const WIDGET_URL = `https://map.boxnow.gr/popup.html?countryCode=bg&language=bg&partnerId=${PARTNER_ID}&autoselect=no&autoclose=yes`
 
 type Props = {
   onSelect: (locker: BoxNowLocker) => void
@@ -18,56 +12,47 @@ type Props = {
 }
 
 export default function BoxNowPicker({ onSelect, onClose }: Props) {
-  const [scriptReady, setScriptReady] = useState(false)
-  const buttonRef = useRef<HTMLButtonElement>(null)
-
   useEffect(() => {
-    window.bn_map_widget_config = {
-      partnerId: PARTNER_ID,
-      parentElement: '#boxnowmap',
-      autoclose: true,
-      autoselect: false,
-      afterSelect: (selected: any) => {
-        onSelect({
-          id: String(selected.boxnowLockerId ?? ''),
-          name: selected.boxnowLockerName ?? selected.boxnowLockerAddressLine1 ?? '',
-          address: selected.boxnowLockerAddressLine1 ?? '',
-          city: selected.boxnowLockerCity ?? '',
-          postCode: selected.boxnowLockerPostalCode ?? '',
-        })
-        onClose()
-      },
+    function handleMessage(event: MessageEvent) {
+      if (!event.origin.includes('boxnow')) return
+      const data = event.data
+      if (!data) return
+      // The widget posts the selected locker data
+      const id = String(data.boxnowLockerId ?? data.id ?? data.lockerId ?? '')
+      if (!id) return
+      onSelect({
+        id,
+        name: data.boxnowLockerName ?? data.name ?? data.boxnowLockerAddressLine1 ?? '',
+        address: data.boxnowLockerAddressLine1 ?? data.address ?? '',
+        city: data.boxnowLockerCity ?? data.city ?? '',
+        postCode: data.boxnowLockerPostalCode ?? data.postCode ?? data.zip ?? '',
+      })
+      onClose()
     }
-  }, [onSelect, onClose])
 
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [onSelect, onClose])
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4">
       <div className="absolute inset-0 bg-navy/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white w-full max-w-2xl shadow-2xl" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-navy/10">
+      <div className="relative bg-white w-full max-w-3xl shadow-2xl" style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-navy/10 flex-shrink-0">
           <h3 className="font-serif text-xl text-navy">Изберете BoxNow автомат</h3>
           <button onClick={onClose} className="p-1 text-navy/40 hover:text-navy transition-colors text-xl leading-none">✕</button>
         </div>
-        <div className="p-4">
-
-          <button
-            ref={buttonRef}
-            type="button"
-            className="boxnow-map-widget-button btn-primary w-full text-center"
-          >
-            {scriptReady ? 'Отвори картата с автоматите' : 'Зарежда...'}
-          </button>
-          <div id="boxnowmap" className="w-full mt-4" />
+        <div className="flex-1 overflow-hidden" style={{ minHeight: '500px' }}>
+          <iframe
+            src={WIDGET_URL}
+            width="100%"
+            height="100%"
+            style={{ border: 'none', minHeight: '500px', display: 'block' }}
+            title="BoxNow Locker Map"
+            allow="geolocation"
+          />
         </div>
       </div>
-
-      <Script
-        src="https://widget-cdn.boxnow.gr/map-widget/client/v5.js"
-        strategy="lazyOnload"
-        onReady={() => setScriptReady(true)}
-        onLoad={() => setScriptReady(true)}
-      />
     </div>
   )
 }
