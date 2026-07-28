@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { writeClient } from '@/sanity/writeClient'
+import { capiTrack } from '@/lib/metaEvents'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
@@ -75,11 +76,13 @@ export async function GET(req: NextRequest) {
 
   if (!code || !sessionId) return NextResponse.json({ ok: false })
 
+  let voucherMeta: Record<string, string> = {}
   try {
     const stripeSession = await stripe.checkout.sessions.retrieve(sessionId)
     if (stripeSession.payment_status !== 'paid') return NextResponse.json({ ok: false })
 
     const meta = stripeSession.metadata || {}
+    voucherMeta = meta
 
     // Save voucher to Sanity
     await writeClient.create({
@@ -133,6 +136,16 @@ export async function GET(req: NextRequest) {
   } catch (e) {
     console.error('Voucher save error:', e)
   }
+
+  await capiTrack('Purchase', {
+    value: Number(voucherMeta.value || WORKSHOP_PRICE),
+    currency: 'EUR',
+    contentName: voucherMeta.voucherType === 'workshop' ? 'Ваучер за работилница' : `Ваучер ${voucherMeta.value}€`,
+    contentType: 'product',
+    numItems: 1,
+    clientIpAddress: req.headers.get('x-forwarded-for') || undefined,
+    clientUserAgent: req.headers.get('user-agent') || undefined,
+  })
 
   return NextResponse.json({ ok: true })
 }

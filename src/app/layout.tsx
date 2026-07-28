@@ -7,6 +7,7 @@ import CookieBanner from '@/components/layout/CookieBanner'
 import { Toaster } from 'react-hot-toast'
 import { client } from '@/sanity/client'
 import { siteLogoQuery } from '@/sanity/queries'
+import MetaPixel from '@/components/analytics/MetaPixel'
 
 export const metadata: Metadata = {
   title: {
@@ -77,6 +78,7 @@ export default async function RootLayout({
         />
       </head>
       <body>
+        <MetaPixel />
         <Header siteLogo={logoData.siteLogo} logoHeight={logoData.logoHeight} />
         <main>{children}</main>
         <Footer />

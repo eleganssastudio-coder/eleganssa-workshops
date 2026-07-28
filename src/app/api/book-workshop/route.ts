@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { writeClient } from '@/sanity/writeClient'
+import { capiTrack } from '@/lib/metaEvents'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
@@ -62,6 +63,15 @@ export async function GET(req: NextRequest) {
   if (workshopId && sessionIndex !== null && spots) {
     await decreaseSpots(workshopId, Number(sessionIndex), Number(spots))
     await sendEmail({ bookingId: bookingId || '', workshopTitle, sessionInfo, spots: Number(spots), total: Number(total), deposit: 20, name, email, phone, paymentMethod: 'card' })
+    await capiTrack('Purchase', {
+      value: 20,
+      currency: 'EUR',
+      contentName: workshopTitle,
+      contentType: 'product',
+      numItems: Number(spots),
+      clientIpAddress: req.headers.get('x-forwarded-for') || undefined,
+      clientUserAgent: req.headers.get('user-agent') || undefined,
+    })
   }
 
   return NextResponse.json({ ok: true })
