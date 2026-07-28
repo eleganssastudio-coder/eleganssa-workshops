@@ -13,14 +13,14 @@ async function getToken(): Promise<string> {
     throw new Error('BoxNow credentials not configured (BOXNOW_CLIENT_ID / BOXNOW_CLIENT_SECRET missing)')
   }
 
-  const res = await fetch(`${API_URL}/api/v1/partners/token`, {
+  const credentials = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')
+  const res = await fetch(`${API_URL}/v1/oauth/token`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      clientId: CLIENT_ID,
-      clientSecret: CLIENT_SECRET,
-      grantType: 'client_credentials',
-    }),
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${credentials}`,
+    },
+    body: new URLSearchParams({ grant_type: 'client_credentials' }),
   })
 
   if (!res.ok) {
