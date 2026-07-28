@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { writeClient } from '@/sanity/writeClient'
 import { capiTrack } from '@/lib/metaEvents'
+import { createParcel } from '@/lib/boxnow'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
@@ -16,7 +17,7 @@ const WORKSHOP_PRICE = 39
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { voucherType, value, deliveryMethod, boxnowAddress, senderName, senderEmail, recipientName, recipientEmail, message } = body
+  const { voucherType, value, deliveryMethod, boxnowAddress, boxnowLockerId, senderName, senderEmail, recipientName, recipientEmail, message } = body
 
   const code = generateCode()
   const origin = req.headers.get('origin')
@@ -55,6 +56,7 @@ export async function POST(req: NextRequest) {
       value: String(resolvedValue),
       deliveryMethod: deliveryMethod || 'digital',
       boxnowAddress: boxnowAddress || '',
+      boxnowLockerId: boxnowLockerId ? String(boxnowLockerId) : '',
       senderName,
       senderEmail,
       recipientName,
@@ -98,6 +100,21 @@ export async function GET(req: NextRequest) {
       used: false,
       paidAt: new Date().toISOString(),
     })
+
+    if (meta.deliveryMethod === 'boxnow' && meta.boxnowLockerId) {
+      try {
+        await createParcel({
+          recipientName: meta.recipientName,
+          recipientPhone: meta.senderEmail,
+          recipientEmail: meta.recipientEmail || meta.senderEmail,
+          lockerId: meta.boxnowLockerId,
+          description: `Ваучер ${code} — Eleganssa Studio`,
+          weight: 0.1,
+        })
+      } catch (e) {
+        console.error('BoxNow parcel error:', e)
+      }
+    }
 
     const deliveryLabel = meta.deliveryMethod === 'digital' ? 'Дигитален — по имейл'
       : meta.deliveryMethod === 'atelier' ? 'Физическа картичка — от ателието'

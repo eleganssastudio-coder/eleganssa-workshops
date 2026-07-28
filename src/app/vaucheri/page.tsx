@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { Gift, Mail, Store, Package } from 'lucide-react'
 import toast from 'react-hot-toast'
-import LocationFinderModal from '@/components/ui/LocationFinderModal'
+import BoxNowPicker from '@/components/ui/BoxNowPicker'
+import type { BoxNowLocker } from '@/lib/boxnow'
 import { MapPin } from 'lucide-react'
 
 type VoucherType = 'workshop' | 'value'
@@ -17,7 +18,7 @@ export default function VouchersPage() {
   const [voucherType, setVoucherType] = useState<VoucherType>('value')
   const [selectedValue, setSelectedValue] = useState<number>(50)
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('digital')
-  const [boxnowAddress, setBoxnowAddress] = useState('')
+  const [boxnowLocker, setBoxnowLocker] = useState<BoxNowLocker | null>(null)
   const [showBoxnowModal, setShowBoxnowModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [form, setForm] = useState({
@@ -34,7 +35,7 @@ export default function VouchersPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (deliveryMethod === 'boxnow' && !boxnowAddress.trim()) {
+    if (deliveryMethod === 'boxnow' && !boxnowLocker) {
       toast.error('Моля, изберете BoxNow автомат.')
       return
     }
@@ -47,7 +48,10 @@ export default function VouchersPage() {
           voucherType,
           value: voucherType === 'value' ? selectedValue : WORKSHOP_PRICE,
           deliveryMethod,
-          boxnowAddress: deliveryMethod === 'boxnow' ? boxnowAddress : '',
+          boxnowAddress: deliveryMethod === 'boxnow' && boxnowLocker
+            ? `${boxnowLocker.name}, ${boxnowLocker.address}, ${boxnowLocker.city}`
+            : '',
+          boxnowLockerId: deliveryMethod === 'boxnow' ? boxnowLocker?.id : undefined,
           ...form,
         }),
       })
@@ -184,8 +188,10 @@ export default function VouchersPage() {
                 onClick={() => setShowBoxnowModal(true)}
                 className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-left flex items-center justify-between gap-2 hover:border-navy transition-colors"
               >
-                <span className={boxnowAddress ? 'text-navy' : 'text-navy/40'}>
-                  {boxnowAddress || 'Изберете автомат от картата...'}
+                <span className={boxnowLocker ? 'text-navy' : 'text-navy/40'}>
+                  {boxnowLocker
+                    ? `${boxnowLocker.name} — ${boxnowLocker.address}, ${boxnowLocker.city}`
+                    : 'Изберете автомат...'}
                 </span>
                 <MapPin className="w-4 h-4 text-navy/40 flex-shrink-0" />
               </button>
@@ -193,10 +199,9 @@ export default function VouchersPage() {
           )}
 
           {showBoxnowModal && (
-            <LocationFinderModal
-              type="boxnow"
+            <BoxNowPicker
+              onSelect={(locker) => { setBoxnowLocker(locker); setShowBoxnowModal(false) }}
               onClose={() => setShowBoxnowModal(false)}
-              onManual={(address) => { setBoxnowAddress(address); setShowBoxnowModal(false) }}
             />
           )}
         </div>

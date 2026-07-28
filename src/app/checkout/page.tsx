@@ -8,6 +8,8 @@ import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import LocationFinderModal from '@/components/ui/LocationFinderModal'
+import BoxNowPicker from '@/components/ui/BoxNowPicker'
+import type { BoxNowLocker } from '@/lib/boxnow'
 
 type Step = 'shipping' | 'payment' | 'done'
 type PaymentMethod = 'bank' | 'cod'
@@ -39,9 +41,10 @@ export default function CheckoutPage() {
   const [voucherChecking, setVoucherChecking] = useState(false)
   const [voucherMsg, setVoucherMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [deliveryType, setDeliveryType] = useState<DeliveryType>('boxnow')
-  const [boxnowAddress, setBoxnowAddress] = useState('')
+  const [boxnowLocker, setBoxnowLocker] = useState<BoxNowLocker | null>(null)
   const [speedyOffice, setSpeedyOffice] = useState('')
-  const [locationModal, setLocationModal] = useState<'boxnow' | 'speedy' | null>(null)
+  const [showBoxNowPicker, setShowBoxNowPicker] = useState(false)
+  const [locationModal, setLocationModal] = useState<'speedy' | null>(null)
   const [shippingData, setShippingData] = useState({
     firstName: '', lastName: '', email: '', phone: '',
   })
@@ -66,7 +69,7 @@ export default function CheckoutPage() {
 
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (deliveryType === 'boxnow' && !boxnowAddress.trim()) { toast.error('Моля, изберете BoxNow автомат.'); return }
+    if (deliveryType === 'boxnow' && !boxnowLocker) { toast.error('Моля, изберете BoxNow автомат.'); return }
     if (deliveryType === 'speedy' && !speedyOffice.trim()) { toast.error('Моля, изберете офис на Спиди.'); return }
     setCurrentStep('payment')
   }
@@ -89,7 +92,7 @@ export default function CheckoutPage() {
           'Начин на плащане': paymentMethod === 'bank' ? 'Банков превод' : 'Наложен платеж',
           'Продукти': itemsList,
           'Доставка': deliveryType === 'boxnow'
-            ? `BoxNow — безплатно · ${boxnowAddress}`
+            ? `BoxNow — безплатно · ${boxnowLocker ? `${boxnowLocker.name}, ${boxnowLocker.address}, ${boxnowLocker.city}` : ''}`
             : `Спиди офис — по тарифа · ${speedyOffice}`,
           ...(voucherDiscount > 0 ? { 'Ваучер': `-${formatPrice(voucherDiscount)}` } : {}),
           'Обща сума': deliveryType === 'speedy' ? `${formatPrice(total)} + доставка Спиди` : formatPrice(total),
@@ -100,6 +103,23 @@ export default function CheckoutPage() {
       })
     } catch (_) {
       toast.error('Грешка при изпращане. Моля, свържете се с нас.')
+    }
+
+    // Create BoxNow parcel if applicable
+    if (deliveryType === 'boxnow' && boxnowLocker) {
+      const itemsList = items.map(i => `${i.name}${i.variant ? ` (${i.variant})` : ''} ×${i.quantity}`).join(', ')
+      await fetch('/api/boxnow/create-parcel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipientName: `${shippingData.firstName} ${shippingData.lastName}`,
+          recipientPhone: shippingData.phone,
+          recipientEmail: shippingData.email,
+          lockerId: boxnowLocker.id,
+          description: `Поръчка ${orderNumber} — ${itemsList}`,
+          codAmount: paymentMethod === 'cod' ? total : 0,
+        }),
+      }).catch(() => {})
     }
 
     clearCart()
@@ -118,13 +138,18 @@ export default function CheckoutPage() {
 
   return (
     <>
+      {showBoxNowPicker && (
+        <BoxNowPicker
+          onSelect={(locker) => setBoxnowLocker(locker)}
+          onClose={() => setShowBoxNowPicker(false)}
+        />
+      )}
       {locationModal && (
         <LocationFinderModal
           type={locationModal}
           onClose={() => setLocationModal(null)}
           onManual={(address) => {
-            if (locationModal === 'boxnow') setBoxnowAddress(address)
-            else setSpeedyOffice(address)
+            setSpeedyOffice(address)
             setLocationModal(null)
           }}
         />
@@ -188,10 +213,10 @@ export default function CheckoutPage() {
                 </p>
               </div>
             )}
-            {deliveryType === 'boxnow' && (
+            {deliveryType === 'boxnow' && boxnowLocker && (
               <div className="bg-cream p-4 mb-4 text-left">
                 <p className="font-sans text-sm text-navy/70">
-                  Доставка чрез <strong>BoxNow</strong> до автомат: <strong>{boxnowAddress}</strong>. Безплатна доставка.
+                  Доставка чрез <strong>BoxNow</strong> до <strong>{boxnowLocker.name}</strong> — {boxnowLocker.address}, {boxnowLocker.city}. Безплатна доставка.
                 </p>
               </div>
             )}
@@ -261,11 +286,13 @@ export default function CheckoutPage() {
                       <label className="block font-sans text-sm text-navy mb-2">BoxNow автомат *</label>
                       <button
                         type="button"
-                        onClick={() => setLocationModal('boxnow')}
+                        onClick={() => setShowBoxNowPicker(true)}
                         className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-left flex items-center justify-between gap-2 hover:border-navy transition-colors"
                       >
-                        <span className={boxnowAddress ? 'text-navy' : 'text-navy/40'}>
-                          {boxnowAddress || 'Изберете автомат от картата...'}
+                        <span className={boxnowLocker ? 'text-navy' : 'text-navy/40'}>
+                          {boxnowLocker
+                            ? `${boxnowLocker.name} — ${boxnowLocker.address}, ${boxnowLocker.city}`
+                            : 'Изберете автомат...'}
                         </span>
                         <MapPin className="w-4 h-4 text-navy/40 flex-shrink-0" />
                       </button>
@@ -277,7 +304,7 @@ export default function CheckoutPage() {
                       <label className="block font-sans text-sm text-navy mb-2">Офис на Спиди *</label>
                       <button
                         type="button"
-                        onClick={() => setLocationModal('speedy')}
+                        onClick={() => setLocationModal('speedy' as any)}
                         className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-left flex items-center justify-between gap-2 hover:border-navy transition-colors"
                       >
                         <span className={speedyOffice ? 'text-navy' : 'text-navy/40'}>
