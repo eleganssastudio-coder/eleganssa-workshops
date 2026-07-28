@@ -8,12 +8,22 @@ export async function GET() {
   const base = apiUrl || 'https://api-production.boxnow.bg'
   const results: any = {}
 
-  // Try multiple auth strategies
+  // Check swagger/docs
+  for (const path of ['/docs', '/swagger', '/api-docs', '/swagger.json', '/v1/swagger.json']) {
+    try {
+      const res = await fetch(`${base}${path}`)
+      results[`GET ${path}`] = { status: res.status }
+    } catch (e) {
+      results[`GET ${path}`] = { error: String(e) }
+    }
+  }
+
+  // Try more auth formats
   const attempts = [
-    { url: `${base}/authentication`, body: { strategy: 'local', clientId, clientSecret } },
-    { url: `${base}/authentication`, body: { strategy: 'local', email: clientId, password: clientSecret } },
-    { url: `${base}/authentication`, body: { strategy: 'api-key', clientId, clientSecret } },
-    { url: `${base}/v1/authentication`, body: { strategy: 'local', clientId, clientSecret } },
+    { label: 'POST /authentication [partner]', url: `${base}/authentication`, body: { strategy: 'partner', clientId, clientSecret } },
+    { label: 'POST /authentication [email+pass]', url: `${base}/authentication`, body: { strategy: 'local', email: clientId, password: clientSecret } },
+    { label: 'POST /v1/oauth/token [body creds]', url: `${base}/v1/oauth/token`, body: { grant_type: 'client_credentials', client_id: clientId, client_secret: clientSecret } },
+    { label: 'POST /oauth/token [body creds]', url: `${base}/oauth/token`, body: { grant_type: 'client_credentials', client_id: clientId, client_secret: clientSecret } },
   ]
 
   for (const attempt of attempts) {
@@ -24,10 +34,9 @@ export async function GET() {
         body: JSON.stringify(attempt.body),
       })
       const text = await res.text()
-      const key = `${attempt.url} [${(attempt.body as any).strategy}]`
-      results[key] = { status: res.status, body: text.slice(0, 200) }
+      results[attempt.label] = { status: res.status, body: text.slice(0, 300) }
     } catch (e) {
-      results[attempt.url] = { error: String(e) }
+      results[attempt.label] = { error: String(e) }
     }
   }
   const authResult = results
