@@ -1,5 +1,7 @@
 import Link from 'next/link'
-import { Instagram, Facebook, MapPin, Mail, Phone } from 'lucide-react'
+import { Instagram, Facebook, MapPin, Mail } from 'lucide-react'
+import { client } from '@/sanity/client'
+import { groq } from 'next-sanity'
 
 const navLinks = [
   { href: '/', label: 'Начало' },
@@ -9,18 +11,26 @@ const navLinks = [
   { href: '/kontakti', label: 'Контакти' },
 ]
 
-const workshopLinks = [
-  { href: '/rabotilnitsi/rabotilnitsa-soevi-sveshti', label: 'Работилница за свещи' },
-  { href: '/rabotilnitsi/rabotilnitsa-jesmonite', label: 'Работилница Jesmonite' },
-]
-
 const legalLinks = [
   { href: '/politika-za-poveritelnost', label: 'Политика за поверителност' },
   { href: '/obshti-uslovia', label: 'Общи условия' },
   { href: '/pravo-na-otkaz', label: 'Право на отказ' },
 ]
 
-export default function Footer() {
+export default async function Footer() {
+  let workshopLinks: { href: string; label: string }[] = []
+  try {
+    if (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
+      const workshops = await client.fetch<{ slug: string; title: string }[]>(
+        groq`*[_type == "workshop" && active == true] | order(_createdAt asc) { "slug": slug.current, title }`
+      )
+      workshopLinks = workshops.map((w) => ({
+        href: `/rabotilnitsi/${w.slug}`,
+        label: w.title,
+      }))
+    }
+  } catch (_) {}
+
   return (
     <footer className="bg-navy text-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
@@ -82,7 +92,7 @@ export default function Footer() {
               Работилници
             </h4>
             <ul className="space-y-3">
-              {workshopLinks.map((link) => (
+              {workshopLinks.length > 0 ? workshopLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -91,7 +101,13 @@ export default function Footer() {
                     {link.label}
                   </Link>
                 </li>
-              ))}
+              )) : (
+                <li>
+                  <Link href="/rabotilnitsi" className="text-cream/70 hover:text-cream font-sans text-sm transition-colors">
+                    Всички работилници
+                  </Link>
+                </li>
+              )}
             </ul>
             <h4 className="font-sans text-xs tracking-widest uppercase text-cream/50 mt-8 mb-6">
               Правна информация
