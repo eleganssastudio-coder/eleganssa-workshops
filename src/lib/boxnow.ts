@@ -13,14 +13,14 @@ async function getToken(): Promise<string> {
     throw new Error('BoxNow credentials not configured (BOXNOW_CLIENT_ID / BOXNOW_CLIENT_SECRET missing)')
   }
 
-  const credentials = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')
-  const res = await fetch(`${API_URL}/v1/oauth/token`, {
+  const res = await fetch(`${API_URL}/authentication`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': `Basic ${credentials}`,
-    },
-    body: new URLSearchParams({ grant_type: 'client_credentials' }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      strategy: 'client-credentials',
+      clientId: CLIENT_ID,
+      clientSecret: CLIENT_SECRET,
+    }),
   })
 
   if (!res.ok) {
@@ -29,15 +29,16 @@ async function getToken(): Promise<string> {
   }
 
   const data = await res.json()
-  if (!data.access_token) {
+  const token = data.accessToken ?? data.access_token
+  if (!token) {
     throw new Error(`BoxNow token missing in response: ${JSON.stringify(data)}`)
   }
 
   tokenCache = {
-    token: data.access_token,
+    token,
     expires: Date.now() + ((data.expires_in ?? 3600) - 60) * 1000,
   }
-  return data.access_token
+  return token
 }
 
 export interface BoxNowLocker {
