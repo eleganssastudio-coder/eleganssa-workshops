@@ -1,9 +1,30 @@
 import { notFound } from 'next/navigation'
+import { Metadata } from 'next'
 import { client } from '@/sanity/client'
 import { productBySlugQuery, productsQuery } from '@/sanity/queries'
 import ProductDetailClient from './ProductDetailClient'
 
 export const revalidate = 60
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  try {
+    if (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) {
+      const product = await client.fetch(productBySlugQuery, { slug: params.slug })
+      if (product) {
+        return {
+          title: product.name,
+          description: product.shortDescription || `${product.name} — ръчно изработено от Eleganssa Studio. ${product.price ? `Цена: ${product.price}€.` : ''}`,
+          openGraph: {
+            title: product.name,
+            description: product.shortDescription || '',
+            images: product.images?.[0] ? [{ url: product.images[0] }] : [],
+          },
+        }
+      }
+    }
+  } catch (_) {}
+  return {}
+}
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   let product = null
@@ -51,5 +72,29 @@ export default async function ProductPage({ params }: { params: { slug: string }
       category: p.category || { name: '', slug: '' },
     }))
 
-  return <ProductDetailClient product={normalized} relatedProducts={related} />
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: normalized.name,
+    description: normalized.shortDescription || '',
+    image: normalized.images[0] || undefined,
+    brand: { '@type': 'Brand', name: 'Eleganssa Studio' },
+    offers: {
+      '@type': 'Offer',
+      price: normalized.price,
+      priceCurrency: 'EUR',
+      availability: normalized.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      url: `https://eleganssastudio.com/magazin/${params.slug}`,
+    },
+  }
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ProductDetailClient product={normalized} relatedProducts={related} />
+    </>
+  )
 }

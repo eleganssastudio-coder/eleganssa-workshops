@@ -78,6 +78,25 @@ export default async function RootLayout({
         />
       </head>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'LocalBusiness',
+              name: 'Eleganssa Studio',
+              url: 'https://eleganssastudio.com',
+              logo: 'https://eleganssastudio.com/logo.png',
+              description: 'Ателие за ръчно изработени соеви свещи и Jesmonite изделия във Варна. Работилници и онлайн магазин.',
+              address: {
+                '@type': 'PostalAddress',
+                addressLocality: 'Варна',
+                addressCountry: 'BG',
+              },
+              sameAs: ['https://www.instagram.com/eleganssa.studio'],
+            }),
+          }}
+        />
         <MetaPixel />
         <Header siteLogo={logoData.siteLogo} logoHeight={logoData.logoHeight} />
         <main>{children}</main>
