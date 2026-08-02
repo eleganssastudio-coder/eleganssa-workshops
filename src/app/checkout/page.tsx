@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronRight, CheckCircle, Banknote, Truck, Package, MapPin } from 'lucide-react'
+import { ChevronRight, CheckCircle, Banknote, Truck, Package, MapPin, CreditCard } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
 import toast from 'react-hot-toast'
@@ -12,8 +12,16 @@ import BoxNowPicker from '@/components/ui/BoxNowPicker'
 import type { BoxNowLocker } from '@/lib/boxnow'
 
 type Step = 'shipping' | 'payment' | 'done'
-type PaymentMethod = 'bank' | 'cod'
-type DeliveryType = 'boxnow' | 'speedy'
+type PaymentMethod = 'bank' | 'cod' | 'stripe'
+type DeliveryType = 'boxnow' | 'speedy-office' | 'speedy-address'
+
+function getShippingCost(deliveryType: DeliveryType, paymentMethod: PaymentMethod): number | null {
+  if (deliveryType === 'boxnow') return 0
+  if (paymentMethod === 'cod') return null // по тарифа
+  if (deliveryType === 'speedy-office') return 2.5
+  if (deliveryType === 'speedy-address') return 5
+  return null
+}
 
 async function validateVoucher(code: string): Promise<{ valid: boolean; value?: number; type?: string }> {
   try {
@@ -43,14 +51,15 @@ export default function CheckoutPage() {
   const [deliveryType, setDeliveryType] = useState<DeliveryType>('boxnow')
   const [boxnowLocker, setBoxnowLocker] = useState<BoxNowLocker | null>(null)
   const [speedyOffice, setSpeedyOffice] = useState('')
+  const [speedyAddress, setSpeedyAddress] = useState('')
   const [showBoxNowPicker, setShowBoxNowPicker] = useState(false)
   const [locationModal, setLocationModal] = useState<'speedy' | null>(null)
   const [shippingData, setShippingData] = useState({
     firstName: '', lastName: '', email: '', phone: '',
   })
 
-  const shipping = deliveryType === 'boxnow' ? 0 : null // BoxNow free; Speedy per tariff
-  const total = Math.max(0, totalPrice() + (shipping ?? 0) - voucherDiscount)
+  const shippingCost = getShippingCost(deliveryType, paymentMethod)
+  const total = Math.max(0, totalPrice() + (shippingCost ?? 0) - voucherDiscount)
 
   const applyVoucher = async () => {
     if (!voucherCode.trim()) return
@@ -70,12 +79,76 @@ export default function CheckoutPage() {
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (deliveryType === 'boxnow' && !boxnowLocker) { toast.error('Моля, изберете BoxNow автомат.'); return }
-    if (deliveryType === 'speedy' && !speedyOffice.trim()) { toast.error('Моля, изберете офис на Спиди.'); return }
+    if (deliveryType === 'speedy-office' && !speedyOffice.trim()) { toast.error('Моля, изберете офис на Спиди.'); return }
+    if (deliveryType === 'speedy-address' && !speedyAddress.trim()) { toast.error('Моля, въведете адрес за доставка.'); return }
     setCurrentStep('payment')
+  }
+
+  const buildDeliveryLabel = () => {
+    if (deliveryType === 'boxnow') {
+      return boxnowLocker
+        ? `BoxNow — безплатно · ${boxnowLocker.name}, ${boxnowLocker.address}, ${boxnowLocker.city}`
+        : 'BoxNow — безплатно'
+    }
+    if (deliveryType === 'speedy-office') {
+      const price = shippingCost !== null ? `${formatPrice(shippingCost)}` : 'по тарифа'
+      return `Спиди до офис (${price}) · ${speedyOffice}`
+    }
+    if (deliveryType === 'speedy-address') {
+      const price = shippingCost !== null ? `${formatPrice(shippingCost)}` : 'по тарифа'
+      return `Спиди до адрес (${price}) · ${speedyAddress}`
+    }
+    return ''
+  }
+
+  const handleStripeSubmit = async () => {
+    setLoading(true)
+    try {
+      const origin = window.location.origin
+      const res = await fetch('/api/checkout/stripe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(i => ({
+            name: i.name,
+            variant: i.variant,
+            price: i.price,
+            quantity: i.quantity,
+            image: i.image,
+          })),
+          shippingCost: shippingCost ?? 0,
+          deliveryType,
+          boxnowLocker: deliveryType === 'boxnow' ? boxnowLocker : null,
+          speedyLocation: deliveryType === 'speedy-office' ? speedyOffice : '',
+          speedyAddress: deliveryType === 'speedy-address' ? speedyAddress : '',
+          shippingData,
+          orderNumber,
+          voucherDiscount,
+          successUrl: `${origin}/checkout/success`,
+          cancelUrl: `${origin}/checkout`,
+        }),
+      })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        toast.error(data.error || 'Грешка при Stripe плащане.')
+        setLoading(false)
+      }
+    } catch {
+      toast.error('Грешка при свързване с платежния оператор.')
+      setLoading(false)
+    }
   }
 
   const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (paymentMethod === 'stripe') {
+      await handleStripeSubmit()
+      return
+    }
+
     setLoading(true)
 
     const itemsList = items
@@ -91,11 +164,11 @@ export default function CheckoutPage() {
           'Номер на поръчката': orderNumber,
           'Начин на плащане': paymentMethod === 'bank' ? 'Банков превод' : 'Наложен платеж',
           'Продукти': itemsList,
-          'Доставка': deliveryType === 'boxnow'
-            ? `BoxNow — безплатно · ${boxnowLocker ? `${boxnowLocker.name}, ${boxnowLocker.address}, ${boxnowLocker.city}` : ''}`
-            : `Спиди офис — по тарифа · ${speedyOffice}`,
+          'Доставка': buildDeliveryLabel(),
           ...(voucherDiscount > 0 ? { 'Ваучер': `-${formatPrice(voucherDiscount)}` } : {}),
-          'Обща сума': deliveryType === 'speedy' ? `${formatPrice(total)} + доставка Спиди` : formatPrice(total),
+          'Обща сума': shippingCost === null
+            ? `${formatPrice(total)} + доставка по тарифа`
+            : formatPrice(total),
           'Имена': `${shippingData.firstName} ${shippingData.lastName}`,
           'Имейл': shippingData.email,
           'Телефон': shippingData.phone,
@@ -105,9 +178,7 @@ export default function CheckoutPage() {
       toast.error('Грешка при изпращане. Моля, свържете се с нас.')
     }
 
-    // Create BoxNow parcel if applicable
     if (deliveryType === 'boxnow' && boxnowLocker) {
-      const itemsList = items.map(i => `${i.name}${i.variant ? ` (${i.variant})` : ''} ×${i.quantity}`).join(', ')
       await fetch('/api/boxnow/create-parcel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -116,7 +187,7 @@ export default function CheckoutPage() {
           recipientPhone: shippingData.phone,
           recipientEmail: shippingData.email,
           lockerId: boxnowLocker.id,
-          description: `Поръчка ${orderNumber} — ${itemsList}`,
+          description: `Поръчка ${orderNumber}`,
           codAmount: paymentMethod === 'cod' ? total : 0,
         }),
       }).catch(() => {})
@@ -135,6 +206,15 @@ export default function CheckoutPage() {
       </div>
     )
   }
+
+  const shippingLabel = (() => {
+    if (deliveryType === 'boxnow') return 'BoxNow — безплатно'
+    if (paymentMethod === 'cod') {
+      return deliveryType === 'speedy-office' ? 'Спиди офис — по тарифа' : 'Спиди до адрес — по тарифа'
+    }
+    if (deliveryType === 'speedy-office') return `Спиди офис — ${formatPrice(2.5)}`
+    return `Спиди до адрес — ${formatPrice(5)}`
+  })()
 
   return (
     <>
@@ -189,10 +269,12 @@ export default function CheckoutPage() {
             <p className="font-sans text-navy/60 mb-2">
               Номер на поръчката: <strong className="text-navy">{orderNumber}</strong>
             </p>
-            {paymentMethod === 'bank' ? (
+            {paymentMethod === 'bank' && (
               <div className="bg-cream p-6 text-left mb-6">
                 <p className="font-serif text-lg text-navy mb-3">Банков превод</p>
-                <p className="font-sans text-sm text-navy/70 mb-1">Моля, наредете <strong>{formatPrice(total)}</strong> по следните данни:</p>
+                <p className="font-sans text-sm text-navy/70 mb-1">
+                  Моля, наредете <strong>{shippingCost !== null ? formatPrice(total) : `${formatPrice(total)} + доставка по тарифа`}</strong> по следните данни:
+                </p>
                 <div className="font-sans text-sm text-navy/80 space-y-1 mt-3">
                   <p><span className="text-navy/40">Получател:</span> ELEGANSA EOOD</p>
                   <p><span className="text-navy/40">IBAN:</span> BG17INTF40012092397597</p>
@@ -201,22 +283,32 @@ export default function CheckoutPage() {
                 </div>
                 <p className="font-sans text-xs text-navy/40 mt-3">Поръчката се обработва след получаване на плащането.</p>
               </div>
-            ) : (
-              <p className="font-sans text-navy/60 mb-6">
-                Ще платите <strong>{formatPrice(total)}</strong> при получаване на пратката.
-              </p>
             )}
-            {deliveryType === 'speedy' && (
-              <div className="bg-cream p-4 mb-4 text-left">
-                <p className="font-sans text-sm text-navy/70">
-                  Доставка чрез <strong>Спиди</strong> до офис <strong>{speedyOffice}</strong>. Цената за доставка ще ви бъде съобщена допълнително.
-                </p>
-              </div>
+            {paymentMethod === 'cod' && (
+              <p className="font-sans text-navy/60 mb-6">
+                Ще платите при получаване на пратката. Цената за доставка е по тарифата на Спиди.
+              </p>
             )}
             {deliveryType === 'boxnow' && boxnowLocker && (
               <div className="bg-cream p-4 mb-4 text-left">
                 <p className="font-sans text-sm text-navy/70">
                   Доставка чрез <strong>BoxNow</strong> до <strong>{boxnowLocker.name}</strong> — {boxnowLocker.address}, {boxnowLocker.city}. Безплатна доставка.
+                </p>
+              </div>
+            )}
+            {deliveryType === 'speedy-office' && (
+              <div className="bg-cream p-4 mb-4 text-left">
+                <p className="font-sans text-sm text-navy/70">
+                  Доставка чрез <strong>Спиди</strong> до офис <strong>{speedyOffice}</strong>.
+                  {paymentMethod === 'cod' && ' Цената за доставка е по тарифата на Спиди.'}
+                </p>
+              </div>
+            )}
+            {deliveryType === 'speedy-address' && (
+              <div className="bg-cream p-4 mb-4 text-left">
+                <p className="font-sans text-sm text-navy/70">
+                  Доставка чрез <strong>Спиди</strong> до адрес <strong>{speedyAddress}</strong>.
+                  {paymentMethod === 'cod' && ' Цената за доставка е по тарифата на Спиди.'}
                 </p>
               </div>
             )}
@@ -260,7 +352,6 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  {/* Delivery */}
                   <h2 className="font-serif text-2xl text-navy mb-4">Начин на доставка</h2>
                   <div className="space-y-3 mb-4">
                     <button type="button" onClick={() => setDeliveryType('boxnow')}
@@ -271,12 +362,20 @@ export default function CheckoutPage() {
                         <p className="font-sans text-xs text-navy/50 mt-0.5">Получавате пратката от BoxNow автомат по ваш избор.</p>
                       </div>
                     </button>
-                    <button type="button" onClick={() => setDeliveryType('speedy')}
-                      className={`w-full text-left p-5 border-2 flex items-start gap-4 transition-colors ${deliveryType === 'speedy' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}>
-                      <Truck className={`w-5 h-5 mt-0.5 flex-shrink-0 ${deliveryType === 'speedy' ? 'text-navy' : 'text-navy/40'}`} />
+                    <button type="button" onClick={() => setDeliveryType('speedy-office')}
+                      className={`w-full text-left p-5 border-2 flex items-start gap-4 transition-colors ${deliveryType === 'speedy-office' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}>
+                      <Truck className={`w-5 h-5 mt-0.5 flex-shrink-0 ${deliveryType === 'speedy-office' ? 'text-navy' : 'text-navy/40'}`} />
                       <div>
-                        <p className="font-sans font-medium text-navy text-sm">Спиди — офис по избор</p>
-                        <p className="font-sans text-xs text-navy/50 mt-0.5">Цената е по тарифата на Спиди и ще бъде потвърдена след поръчката.</p>
+                        <p className="font-sans font-medium text-navy text-sm">Спиди — офис/автомат — 2.50 €</p>
+                        <p className="font-sans text-xs text-navy/50 mt-0.5">При плащане с карта или банков превод. При наложен платеж — по тарифата на Спиди.</p>
+                      </div>
+                    </button>
+                    <button type="button" onClick={() => setDeliveryType('speedy-address')}
+                      className={`w-full text-left p-5 border-2 flex items-start gap-4 transition-colors ${deliveryType === 'speedy-address' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}>
+                      <MapPin className={`w-5 h-5 mt-0.5 flex-shrink-0 ${deliveryType === 'speedy-address' ? 'text-navy' : 'text-navy/40'}`} />
+                      <div>
+                        <p className="font-sans font-medium text-navy text-sm">Спиди — до адрес — 5.00 €</p>
+                        <p className="font-sans text-xs text-navy/50 mt-0.5">При плащане с карта или банков превод. При наложен платеж — по тарифата на Спиди.</p>
                       </div>
                     </button>
                   </div>
@@ -299,12 +398,12 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {deliveryType === 'speedy' && (
+                  {deliveryType === 'speedy-office' && (
                     <div className="mb-8">
                       <label className="block font-sans text-sm text-navy mb-2">Офис на Спиди *</label>
                       <button
                         type="button"
-                        onClick={() => setLocationModal('speedy' as any)}
+                        onClick={() => setLocationModal('speedy')}
                         className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-left flex items-center justify-between gap-2 hover:border-navy transition-colors"
                       >
                         <span className={speedyOffice ? 'text-navy' : 'text-navy/40'}>
@@ -312,7 +411,19 @@ export default function CheckoutPage() {
                         </span>
                         <MapPin className="w-4 h-4 text-navy/40 flex-shrink-0" />
                       </button>
-                      <p className="font-sans text-xs text-navy/40 mt-2">Цената е по тарифата на Спиди и ще бъде потвърдена след поръчката.</p>
+                    </div>
+                  )}
+
+                  {deliveryType === 'speedy-address' && (
+                    <div className="mb-8">
+                      <label className="block font-sans text-sm text-navy mb-2">Адрес за доставка *</label>
+                      <input
+                        type="text"
+                        value={speedyAddress}
+                        onChange={(e) => setSpeedyAddress(e.target.value)}
+                        placeholder="ул. Примерна 1, гр. София"
+                        className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy"
+                      />
                     </div>
                   )}
 
@@ -329,6 +440,22 @@ export default function CheckoutPage() {
                   <div className="space-y-3 mb-8">
                     <button
                       type="button"
+                      onClick={() => setPaymentMethod('stripe')}
+                      className={`w-full text-left p-5 border-2 transition-colors flex items-start gap-4 ${
+                        paymentMethod === 'stripe' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'
+                      }`}
+                    >
+                      <CreditCard className={`w-5 h-5 mt-0.5 flex-shrink-0 ${paymentMethod === 'stripe' ? 'text-navy' : 'text-navy/40'}`} />
+                      <div>
+                        <p className="font-sans font-medium text-navy text-sm">Плащане с карта</p>
+                        <p className="font-sans text-xs text-navy/50 mt-1">
+                          Сигурно онлайн плащане с дебитна или кредитна карта чрез Stripe.
+                        </p>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={() => setPaymentMethod('bank')}
                       className={`w-full text-left p-5 border-2 transition-colors flex items-start gap-4 ${
                         paymentMethod === 'bank' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'
@@ -343,24 +470,25 @@ export default function CheckoutPage() {
                       </div>
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod('cod')}
-                      className={`w-full text-left p-5 border-2 transition-colors flex items-start gap-4 ${
-                        paymentMethod === 'cod' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'
-                      }`}
-                    >
-                      <Truck className={`w-5 h-5 mt-0.5 flex-shrink-0 ${paymentMethod === 'cod' ? 'text-navy' : 'text-navy/40'}`} />
-                      <div>
-                        <p className="font-sans font-medium text-navy text-sm">Наложен платеж</p>
-                        <p className="font-sans text-xs text-navy/50 mt-1">
-                          Плащате в брой при получаване на пратката от куриера.
-                        </p>
-                      </div>
-                    </button>
+                    {deliveryType !== 'boxnow' && (
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMethod('cod')}
+                        className={`w-full text-left p-5 border-2 transition-colors flex items-start gap-4 ${
+                          paymentMethod === 'cod' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'
+                        }`}
+                      >
+                        <Truck className={`w-5 h-5 mt-0.5 flex-shrink-0 ${paymentMethod === 'cod' ? 'text-navy' : 'text-navy/40'}`} />
+                        <div>
+                          <p className="font-sans font-medium text-navy text-sm">Наложен платеж — по тарифа</p>
+                          <p className="font-sans text-xs text-navy/50 mt-1">
+                            Плащате в брой при получаване. Цената за доставка е по тарифата на Спиди.
+                          </p>
+                        </div>
+                      </button>
+                    )}
                   </div>
 
-                  {/* Voucher code */}
                   <div className="mb-6">
                     <p className="font-sans text-sm font-medium text-navy mb-3">Код на ваучер (по избор)</p>
                     <div className="flex gap-2">
@@ -392,7 +520,11 @@ export default function CheckoutPage() {
                       Назад
                     </button>
                     <button type="submit" disabled={loading} className="btn-primary flex-1 text-center disabled:opacity-50">
-                      {loading ? 'Изпращане...' : `Потвърди поръчката — ${formatPrice(total)}`}
+                      {loading
+                        ? (paymentMethod === 'stripe' ? 'Пренасочване...' : 'Изпращане...')
+                        : paymentMethod === 'stripe'
+                        ? `Плати с карта — ${formatPrice(total)}`
+                        : `Потвърди поръчката — ${shippingCost !== null ? formatPrice(total) : `${formatPrice(total)} + доставка`}`}
                     </button>
                   </div>
                 </form>
@@ -430,7 +562,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between font-sans text-sm text-navy">
                     <span>Доставка</span>
-                    <span>{deliveryType === 'boxnow' ? 'BoxNow — безплатно' : 'Спиди — по тарифа'}</span>
+                    <span>{shippingLabel}</span>
                   </div>
                   {voucherDiscount > 0 && (
                     <div className="flex justify-between font-sans text-sm text-sage">
@@ -442,7 +574,9 @@ export default function CheckoutPage() {
                 <div className="border-t border-navy/10 pt-4">
                   <div className="flex justify-between">
                     <span className="font-serif text-xl text-navy">Общо</span>
-                    <span className="font-serif text-xl text-navy">{formatPrice(total)}</span>
+                    <span className="font-serif text-xl text-navy">
+                      {shippingCost !== null ? formatPrice(total) : `${formatPrice(total)} + доставка`}
+                    </span>
                   </div>
                 </div>
               </div>
