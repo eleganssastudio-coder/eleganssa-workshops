@@ -9,8 +9,7 @@ import { formatPrice } from '@/lib/utils'
 export default function KoshtoritsaPage() {
   const { items, removeItem, updateQuantity, clearCart, totalPrice } = useCartStore()
 
-  const shipping = totalPrice() >= 100 ? 0 : 7
-  const total = totalPrice() + shipping
+  const total = totalPrice()
 
   return (
     <>
@@ -122,20 +121,15 @@ export default function KoshtoritsaPage() {
                   </div>
                   <div className="flex justify-between font-sans text-sm text-navy">
                     <span>Доставка</span>
-                    <span>{shipping === 0 ? 'Безплатна' : formatPrice(shipping)}</span>
+                    <span className="text-navy/50">изчислява се при поръчка</span>
                   </div>
-                  {shipping > 0 && (
-                    <p className="font-sans text-xs text-sage">
-                      Безплатна доставка при поръчки над {formatPrice(100)}
-                    </p>
-                  )}
                 </div>
                 <div className="border-t border-navy/10 pt-4 mb-6">
                   <div className="flex justify-between">
                     <span className="font-serif text-xl text-navy">Общо</span>
                     <span className="font-serif text-xl text-navy">{formatPrice(total)}</span>
                   </div>
-                  <p className="font-sans text-xs text-navy/40 mt-1">Включен ДДС</p>
+                  <p className="font-sans text-xs text-navy/40 mt-1">Без доставка</p>
                 </div>
 
                 {/* Promo code */}
