@@ -7,6 +7,7 @@ import { ChevronRight, CheckCircle, MapPin } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
 import toast from 'react-hot-toast'
+import { pixelTrack } from '@/lib/metaEvents'
 import LocationFinderModal from '@/components/ui/LocationFinderModal'
 import BoxNowPicker from '@/components/ui/BoxNowPicker'
 import type { BoxNowLocker } from '@/lib/boxnow'
@@ -147,6 +148,7 @@ export default function CheckoutPage() {
       toast.error('Грешка при изпращане. Моля, свържете се с нас.')
     }
 
+    pixelTrack('Purchase', { value: total, currency: 'EUR', content_type: 'product' })
     clearCart()
     setCurrentStep('done')
     setLoading(false)

@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useCartStore } from '@/store/cartStore'
+import { pixelTrack } from '@/lib/metaEvents'
 
 function SuccessContent() {
   const searchParams = useSearchParams()
@@ -26,6 +27,11 @@ function SuccessContent() {
 
         setData(res)
         clearCart()
+        pixelTrack('Purchase', {
+          value: res.amountTotal ? res.amountTotal / 100 : undefined,
+          currency: 'EUR',
+          content_type: 'product',
+        })
 
         const meta = res.metadata || {}
         const deliveryLabel =
