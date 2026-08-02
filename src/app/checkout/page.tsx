@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronRight, CheckCircle, Banknote, Truck, Package, MapPin, CreditCard } from 'lucide-react'
+import { ChevronRight, CheckCircle, MapPin } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice } from '@/lib/utils'
 import toast from 'react-hot-toast'
@@ -11,8 +11,8 @@ import LocationFinderModal from '@/components/ui/LocationFinderModal'
 import BoxNowPicker from '@/components/ui/BoxNowPicker'
 import type { BoxNowLocker } from '@/lib/boxnow'
 
-type Step = 'payment' | 'shipping' | 'done'
-type PaymentMethod = 'stripe' | 'bank' | 'cod'
+type Step = 'shipping' | 'payment' | 'done'
+type PaymentMethod = 'stripe' | 'cod'
 type DeliveryType = 'boxnow' | 'speedy-office' | 'speedy-address'
 
 function getShippingCost(deliveryType: DeliveryType, paymentMethod: PaymentMethod): number | null {
@@ -31,14 +31,14 @@ async function validateVoucher(code: string): Promise<{ valid: boolean; value?: 
 }
 
 const steps = [
-  { id: 'payment', label: 'Плащане' },
   { id: 'shipping', label: 'Доставка' },
+  { id: 'payment', label: 'Плащане' },
   { id: 'done', label: 'Потвърждение' },
 ]
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCartStore()
-  const [currentStep, setCurrentStep] = useState<Step>('payment')
+  const [currentStep, setCurrentStep] = useState<Step>('shipping')
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('stripe')
   const [loading, setLoading] = useState(false)
   const [orderNumber] = useState(`ES-${Date.now().toString().slice(-6)}`)
@@ -74,14 +74,20 @@ export default function CheckoutPage() {
     setVoucherChecking(false)
   }
 
-  const handleShippingSubmit = async (e: React.FormEvent) => {
+  const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (deliveryType === 'boxnow' && !boxnowLocker) { toast.error('Моля, изберете BoxNow автомат.'); return }
     if (deliveryType === 'speedy-office' && !speedyOffice.trim()) { toast.error('Моля, изберете офис на Спиди.'); return }
     if (deliveryType === 'speedy-address' && !speedyAddress.trim()) { toast.error('Моля, въведете адрес за доставка.'); return }
+    if (deliveryType === 'boxnow') setPaymentMethod('stripe') // COD not available for BoxNow
+    setCurrentStep('payment')
+  }
+
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
 
     if (paymentMethod === 'stripe') {
-      setLoading(true)
       try {
         const origin = window.location.origin
         const res = await fetch('/api/checkout/stripe', {
@@ -111,13 +117,10 @@ export default function CheckoutPage() {
       return
     }
 
-    setLoading(true)
-
-    const deliveryLabel = deliveryType === 'boxnow'
-      ? `BoxNow — безплатно · ${boxnowLocker ? `${boxnowLocker.name}, ${boxnowLocker.address}, ${boxnowLocker.city}` : ''}`
-      : deliveryType === 'speedy-office'
-      ? `Спиди офис (${shippingCost !== null ? formatPrice(shippingCost) : 'по тарифа'}) · ${speedyOffice}`
-      : `Спиди до адрес (${shippingCost !== null ? formatPrice(shippingCost) : 'по тарифа'}) · ${speedyAddress}`
+    // COD flow
+    const deliveryLabel = deliveryType === 'speedy-office'
+      ? `Спиди офис — по тарифа · ${speedyOffice}`
+      : `Спиди до адрес — по тарифа · ${speedyAddress}`
 
     const itemsList = items
       .map(i => `${i.name}${i.variant ? ` (${i.variant})` : ''} × ${i.quantity} = ${formatPrice(i.price * i.quantity)}`)
@@ -130,11 +133,11 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           _subject: `Нова поръчка от магазина — ${orderNumber}`,
           'Номер на поръчката': orderNumber,
-          'Начин на плащане': paymentMethod === 'bank' ? 'Банков превод' : 'Наложен платеж',
+          'Начин на плащане': 'Наложен платеж',
           'Продукти': itemsList,
           'Доставка': deliveryLabel,
           ...(voucherDiscount > 0 ? { 'Ваучер': `-${formatPrice(voucherDiscount)}` } : {}),
-          'Обща сума': shippingCost === null ? `${formatPrice(total)} + доставка по тарифа` : formatPrice(total),
+          'Обща сума': `${formatPrice(total)} + доставка по тарифа`,
           'Имена': `${shippingData.firstName} ${shippingData.lastName}`,
           'Имейл': shippingData.email,
           'Телефон': shippingData.phone,
@@ -144,32 +147,10 @@ export default function CheckoutPage() {
       toast.error('Грешка при изпращане. Моля, свържете се с нас.')
     }
 
-    if (deliveryType === 'boxnow' && boxnowLocker) {
-      await fetch('/api/boxnow/create-parcel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recipientName: `${shippingData.firstName} ${shippingData.lastName}`,
-          recipientPhone: shippingData.phone,
-          recipientEmail: shippingData.email,
-          lockerId: boxnowLocker.id,
-          description: `Поръчка ${orderNumber}`,
-          codAmount: 0,
-        }),
-      }).catch(() => {})
-    }
-
     clearCart()
     setCurrentStep('done')
     setLoading(false)
   }
-
-  const shippingLabel = (() => {
-    if (deliveryType === 'boxnow') return 'BoxNow — безплатно'
-    if (paymentMethod === 'cod') return deliveryType === 'speedy-office' ? 'Спиди офис — по тарифа' : 'Спиди до адрес — по тарифа'
-    if (deliveryType === 'speedy-office') return `Спиди офис — ${formatPrice(2.5)}`
-    return `Спиди до адрес — ${formatPrice(5)}`
-  })()
 
   if (items.length === 0 && currentStep !== 'done') {
     return (
@@ -181,6 +162,13 @@ export default function CheckoutPage() {
   }
 
   const stepIndex = steps.findIndex(s => s.id === currentStep)
+
+  // Delivery label for order summary
+  const deliveryLabel = (() => {
+    if (deliveryType === 'boxnow') return 'BoxNow — безплатно'
+    const price = shippingCost !== null ? formatPrice(shippingCost) : 'по тарифа'
+    return deliveryType === 'speedy-office' ? `Спиди офис — ${price}` : `Спиди до адрес — ${price}`
+  })()
 
   return (
     <>
@@ -198,7 +186,7 @@ export default function CheckoutPage() {
         />
       )}
 
-      {/* Header breadcrumb */}
+      {/* Breadcrumb header */}
       <div className="bg-cream py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link href="/" className="font-serif text-2xl text-navy tracking-wider lowercase block mb-6">
@@ -226,45 +214,20 @@ export default function CheckoutPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {currentStep === 'done' ? (
-          /* ── DONE ── */
+          /* ── CONFIRMATION ── */
           <div className="max-w-lg mx-auto text-center py-12">
             <CheckCircle className="w-20 h-20 text-sage mx-auto mb-6" />
             <h1 className="font-serif text-4xl text-navy mb-4">Поръчката е направена!</h1>
             <p className="font-sans text-navy/60 mb-2">
               Номер на поръчката: <strong className="text-navy">{orderNumber}</strong>
             </p>
-            {paymentMethod === 'bank' && (
-              <div className="bg-cream p-6 text-left mb-6">
-                <p className="font-serif text-lg text-navy mb-3">Банков превод</p>
-                <p className="font-sans text-sm text-navy/70 mb-1">
-                  Моля, наредете <strong>{shippingCost !== null ? formatPrice(total) : `${formatPrice(total)} + доставка по тарифа`}</strong> по следните данни:
-                </p>
-                <div className="font-sans text-sm text-navy/80 space-y-1 mt-3">
-                  <p><span className="text-navy/40">Получател:</span> ELEGANSA EOOD</p>
-                  <p><span className="text-navy/40">IBAN:</span> BG17INTF40012092397597</p>
-                  <p><span className="text-navy/40">Банка:</span> iCard AD (INTFBGSF)</p>
-                  <p><span className="text-navy/40">Основание:</span> Поръчка {orderNumber}</p>
-                </div>
-                <p className="font-sans text-xs text-navy/40 mt-3">Поръчката се обработва след получаване на плащането.</p>
-              </div>
-            )}
-            {paymentMethod === 'cod' && (
-              <p className="font-sans text-navy/60 mb-6">
-                Ще платите при получаване на пратката. Цената за доставка е по тарифата на Спиди.
-              </p>
-            )}
-            {deliveryType === 'boxnow' && boxnowLocker && (
-              <div className="bg-cream p-4 mb-4 text-left">
-                <p className="font-sans text-sm text-navy/70">
-                  Доставка чрез <strong>BoxNow</strong> до <strong>{boxnowLocker.name}</strong> — {boxnowLocker.address}, {boxnowLocker.city}. Безплатна доставка.
-                </p>
-              </div>
-            )}
+            <p className="font-sans text-navy/60 mb-6">
+              Ще платите при получаване на пратката. Цената за доставка е по тарифата на Спиди.
+            </p>
             {deliveryType === 'speedy-office' && (
               <div className="bg-cream p-4 mb-4 text-left">
                 <p className="font-sans text-sm text-navy/70">
                   Доставка чрез <strong>Спиди</strong> до офис <strong>{speedyOffice}</strong>.
-                  {paymentMethod === 'cod' && ' Цената за доставка е по тарифата на Спиди.'}
                 </p>
               </div>
             )}
@@ -272,7 +235,6 @@ export default function CheckoutPage() {
               <div className="bg-cream p-4 mb-4 text-left">
                 <p className="font-sans text-sm text-navy/70">
                   Доставка чрез <strong>Спиди</strong> до адрес <strong>{speedyAddress}</strong>.
-                  {paymentMethod === 'cod' && ' Цената за доставка е по тарифата на Спиди.'}
                 </p>
               </div>
             )}
@@ -285,65 +247,10 @@ export default function CheckoutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             <div>
 
-              {/* ── STEP 1: PAYMENT ── */}
-              {currentStep === 'payment' && (
-                <div>
-                  <h2 className="font-serif text-2xl text-navy mb-6">Начин на плащане</h2>
-                  <div className="space-y-3">
-                    {[
-                      {
-                        id: 'stripe' as PaymentMethod,
-                        icon: <CreditCard className={`w-5 h-5 mt-0.5 flex-shrink-0 ${paymentMethod === 'stripe' ? 'text-navy' : 'text-navy/40'}`} />,
-                        title: 'Плащане с карта',
-                        desc: 'Сигурно онлайн плащане с дебитна или кредитна карта чрез Stripe.',
-                      },
-                      {
-                        id: 'bank' as PaymentMethod,
-                        icon: <Banknote className={`w-5 h-5 mt-0.5 flex-shrink-0 ${paymentMethod === 'bank' ? 'text-navy' : 'text-navy/40'}`} />,
-                        title: 'Банков превод',
-                        desc: 'Получавате банковите данни след потвърждение. Поръчката се обработва след получаване на плащането.',
-                      },
-                      {
-                        id: 'cod' as PaymentMethod,
-                        icon: <Truck className={`w-5 h-5 mt-0.5 flex-shrink-0 ${paymentMethod === 'cod' ? 'text-navy' : 'text-navy/40'}`} />,
-                        title: 'Наложен платеж — по тарифа',
-                        desc: 'Плащате в брой при получаване. Само за Спиди — не е налично за BoxNow.',
-                      },
-                    ].map(opt => (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => {
-                          setPaymentMethod(opt.id)
-                          if (opt.id === 'cod' && deliveryType === 'boxnow') setDeliveryType('speedy-office')
-                        }}
-                        className={`w-full text-left p-5 border-2 transition-colors flex items-start gap-4 ${
-                          paymentMethod === opt.id ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'
-                        }`}
-                      >
-                        {opt.icon}
-                        <div>
-                          <p className="font-sans font-medium text-navy text-sm">{opt.title}</p>
-                          <p className="font-sans text-xs text-navy/50 mt-1">{opt.desc}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => setCurrentStep('shipping')}
-                    className="btn-primary w-full text-center mt-8"
-                  >
-                    Продължи към доставка
-                  </button>
-                </div>
-              )}
-
-              {/* ── STEP 2: SHIPPING + PERSONAL INFO ── */}
+              {/* ── STEP 1: SHIPPING ── */}
               {currentStep === 'shipping' && (
                 <form onSubmit={handleShippingSubmit}>
-                  {/* Personal info */}
-                  <h2 className="font-serif text-2xl text-navy mb-6">Вашите данни</h2>
+                  <h2 className="font-serif text-2xl text-navy mb-6">Данни на клиента</h2>
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
                       <label className="block font-sans text-sm text-navy mb-2">Име *</label>
@@ -358,7 +265,7 @@ export default function CheckoutPage() {
                         className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 mb-8">
+                  <div className="grid grid-cols-2 gap-4 mb-10">
                     <div>
                       <label className="block font-sans text-sm text-navy mb-2">Имейл *</label>
                       <input required type="email" value={shippingData.email}
@@ -373,49 +280,49 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  {/* Delivery */}
                   <h2 className="font-serif text-2xl text-navy mb-4">Начин на доставка</h2>
-                  <div className="space-y-3 mb-4">
-                    {paymentMethod !== 'cod' && (
-                      <button type="button" onClick={() => setDeliveryType('boxnow')}
-                        className={`w-full text-left p-5 border-2 flex items-start gap-4 transition-colors ${deliveryType === 'boxnow' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}>
-                        <Package className={`w-5 h-5 mt-0.5 flex-shrink-0 ${deliveryType === 'boxnow' ? 'text-navy' : 'text-navy/40'}`} />
-                        <div>
-                          <p className="font-sans font-medium text-navy text-sm">BoxNow автомат — Безплатно</p>
-                          <p className="font-sans text-xs text-navy/50 mt-0.5">Получавате пратката от BoxNow автомат по ваш избор.</p>
-                        </div>
-                      </button>
-                    )}
-                    <button type="button" onClick={() => setDeliveryType('speedy-office')}
-                      className={`w-full text-left p-5 border-2 flex items-start gap-4 transition-colors ${deliveryType === 'speedy-office' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}>
-                      <Truck className={`w-5 h-5 mt-0.5 flex-shrink-0 ${deliveryType === 'speedy-office' ? 'text-navy' : 'text-navy/40'}`} />
-                      <div>
-                        <p className="font-sans font-medium text-navy text-sm">
-                          Спиди — офис/автомат{paymentMethod !== 'cod' ? ' — 2.50 €' : ' — по тарифа'}
-                        </p>
-                        <p className="font-sans text-xs text-navy/50 mt-0.5">Получавате пратката от офис или автомат на Спиди.</p>
+                  <div className="border border-navy/15 divide-y divide-navy/10 mb-6">
+                    {/* BoxNow */}
+                    <label className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-navy/2">
+                      <div className="flex items-center gap-3">
+                        <input type="radio" name="delivery" checked={deliveryType === 'boxnow'}
+                          onChange={() => setDeliveryType('boxnow')}
+                          className="w-4 h-4 accent-navy" />
+                        <span className="font-sans text-sm text-navy">BoxNow автомат</span>
                       </div>
-                    </button>
-                    <button type="button" onClick={() => setDeliveryType('speedy-address')}
-                      className={`w-full text-left p-5 border-2 flex items-start gap-4 transition-colors ${deliveryType === 'speedy-address' ? 'border-navy bg-navy/5' : 'border-navy/20 hover:border-navy/40'}`}>
-                      <MapPin className={`w-5 h-5 mt-0.5 flex-shrink-0 ${deliveryType === 'speedy-address' ? 'text-navy' : 'text-navy/40'}`} />
-                      <div>
-                        <p className="font-sans font-medium text-navy text-sm">
-                          Спиди — до адрес{paymentMethod !== 'cod' ? ' — 5.00 €' : ' — по тарифа'}
-                        </p>
-                        <p className="font-sans text-xs text-navy/50 mt-0.5">Куриерът доставя до вашия адрес.</p>
+                      <span className="font-sans text-sm text-sage font-medium">Безплатна доставка</span>
+                    </label>
+
+                    {/* Speedy office */}
+                    <label className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-navy/2">
+                      <div className="flex items-center gap-3">
+                        <input type="radio" name="delivery" checked={deliveryType === 'speedy-office'}
+                          onChange={() => setDeliveryType('speedy-office')}
+                          className="w-4 h-4 accent-navy" />
+                        <span className="font-sans text-sm text-navy">Спиди — офис/автомат</span>
                       </div>
-                    </button>
+                      <span className="font-sans text-sm text-navy">2.50 €</span>
+                    </label>
+
+                    {/* Speedy address */}
+                    <label className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-navy/2">
+                      <div className="flex items-center gap-3">
+                        <input type="radio" name="delivery" checked={deliveryType === 'speedy-address'}
+                          onChange={() => setDeliveryType('speedy-address')}
+                          className="w-4 h-4 accent-navy" />
+                        <span className="font-sans text-sm text-navy">Спиди — до адрес</span>
+                      </div>
+                      <span className="font-sans text-sm text-navy">5.00 €</span>
+                    </label>
                   </div>
 
                   {/* Delivery detail */}
                   {deliveryType === 'boxnow' && (
                     <div className="mb-6">
-                      <label className="block font-sans text-sm text-navy mb-2">BoxNow автомат *</label>
                       <button type="button" onClick={() => setShowBoxNowPicker(true)}
                         className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-left flex items-center justify-between gap-2 hover:border-navy transition-colors">
                         <span className={boxnowLocker ? 'text-navy' : 'text-navy/40'}>
-                          {boxnowLocker ? `${boxnowLocker.name} — ${boxnowLocker.address}, ${boxnowLocker.city}` : 'Изберете автомат...'}
+                          {boxnowLocker ? `${boxnowLocker.name} — ${boxnowLocker.address}, ${boxnowLocker.city}` : 'Изберете BoxNow автомат...'}
                         </span>
                         <MapPin className="w-4 h-4 text-navy/40 flex-shrink-0" />
                       </button>
@@ -423,11 +330,10 @@ export default function CheckoutPage() {
                   )}
                   {deliveryType === 'speedy-office' && (
                     <div className="mb-6">
-                      <label className="block font-sans text-sm text-navy mb-2">Офис на Спиди *</label>
                       <button type="button" onClick={() => setLocationModal('speedy')}
                         className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-left flex items-center justify-between gap-2 hover:border-navy transition-colors">
                         <span className={speedyOffice ? 'text-navy' : 'text-navy/40'}>
-                          {speedyOffice || 'Изберете офис от картата...'}
+                          {speedyOffice || 'Изберете офис на Спиди...'}
                         </span>
                         <MapPin className="w-4 h-4 text-navy/40 flex-shrink-0" />
                       </button>
@@ -435,13 +341,46 @@ export default function CheckoutPage() {
                   )}
                   {deliveryType === 'speedy-address' && (
                     <div className="mb-6">
-                      <label className="block font-sans text-sm text-navy mb-2">Адрес за доставка *</label>
                       <input type="text" value={speedyAddress}
                         onChange={(e) => setSpeedyAddress(e.target.value)}
                         placeholder="ул. Примерна 1, гр. София"
                         className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-transparent focus:outline-none focus:border-navy" />
                     </div>
                   )}
+
+                  <button type="submit" className="btn-primary w-full text-center">
+                    Продължи към плащане
+                  </button>
+                </form>
+              )}
+
+              {/* ── STEP 2: PAYMENT ── */}
+              {currentStep === 'payment' && (
+                <form onSubmit={handlePaymentSubmit}>
+                  <h2 className="font-serif text-2xl text-navy mb-6">Начин на плащане</h2>
+
+                  <div className="border border-navy/15 divide-y divide-navy/10 mb-8">
+                    <label className="flex items-center gap-3 px-5 py-4 cursor-pointer hover:bg-navy/2">
+                      <input type="radio" name="payment" checked={paymentMethod === 'stripe'}
+                        onChange={() => setPaymentMethod('stripe')}
+                        className="w-4 h-4 accent-navy" />
+                      <span className="font-sans text-sm text-navy">С карта</span>
+                      <span className="ml-auto flex gap-1 opacity-60">
+                        <span className="text-xs border border-navy/20 px-1.5 py-0.5 font-sans">VISA</span>
+                        <span className="text-xs border border-navy/20 px-1.5 py-0.5 font-sans">MC</span>
+                      </span>
+                    </label>
+
+                    {deliveryType !== 'boxnow' && (
+                      <label className="flex items-center gap-3 px-5 py-4 cursor-pointer hover:bg-navy/2">
+                        <input type="radio" name="payment" checked={paymentMethod === 'cod'}
+                          onChange={() => setPaymentMethod('cod')}
+                          className="w-4 h-4 accent-navy" />
+                        <span className="font-sans text-sm text-navy">Наложен платеж</span>
+                        <span className="ml-auto font-sans text-xs text-navy/50">по тарифа</span>
+                      </label>
+                    )}
+                  </div>
 
                   {/* Voucher */}
                   <div className="mb-8">
@@ -464,23 +403,22 @@ export default function CheckoutPage() {
                     )}
                   </div>
 
-                  <div className="flex gap-3">
-                    <button type="button" onClick={() => setCurrentStep('payment')} className="btn-outline">
-                      Назад
-                    </button>
-                    <button type="submit" disabled={loading} className="btn-primary flex-1 text-center disabled:opacity-50">
-                      {loading
-                        ? (paymentMethod === 'stripe' ? 'Пренасочване...' : 'Изпращане...')
-                        : paymentMethod === 'stripe'
-                        ? `Плати с карта — ${formatPrice(total)}`
-                        : `Потвърди поръчката — ${shippingCost !== null ? formatPrice(total) : `${formatPrice(total)} + доставка`}`}
-                    </button>
-                  </div>
+                  <button type="submit" disabled={loading} className="btn-primary w-full text-center mb-3 disabled:opacity-50">
+                    {loading
+                      ? (paymentMethod === 'stripe' ? 'Пренасочване...' : 'Изпращане...')
+                      : paymentMethod === 'stripe'
+                      ? `Плати с карта — ${formatPrice(total)}`
+                      : `Потвърди поръчката — ${formatPrice(total)} + доставка`}
+                  </button>
+                  <button type="button" onClick={() => setCurrentStep('shipping')}
+                    className="w-full text-center font-sans text-sm text-navy/50 hover:text-navy transition-colors py-2">
+                    ← Назад към доставката
+                  </button>
                 </form>
               )}
             </div>
 
-            {/* Order Summary */}
+            {/* ── ORDER SUMMARY ── */}
             <div>
               <div className="bg-cream p-8 sticky top-24">
                 <h2 className="font-serif text-2xl text-navy mb-6">Вашата поръчка</h2>
@@ -495,11 +433,11 @@ export default function CheckoutPage() {
                             {item.quantity}
                           </div>
                         </div>
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <p className="font-serif text-navy text-sm">{item.name}</p>
                           {item.variant && <p className="font-sans text-xs text-navy/50">{item.variant}</p>}
                         </div>
-                        <span className="font-sans text-sm text-navy">{formatPrice(item.price * item.quantity)}</span>
+                        <span className="font-sans text-sm text-navy whitespace-nowrap">{formatPrice(item.price * item.quantity)}</span>
                       </div>
                     )
                   })}
@@ -509,12 +447,10 @@ export default function CheckoutPage() {
                     <span>Продукти</span>
                     <span>{formatPrice(totalPrice())}</span>
                   </div>
-                  {currentStep === 'shipping' && (
-                    <div className="flex justify-between font-sans text-sm text-navy">
-                      <span>Доставка</span>
-                      <span>{shippingLabel}</span>
-                    </div>
-                  )}
+                  <div className="flex justify-between font-sans text-sm text-navy">
+                    <span>Доставка</span>
+                    <span className={shippingCost === 0 ? 'text-sage' : ''}>{deliveryLabel}</span>
+                  </div>
                   {voucherDiscount > 0 && (
                     <div className="flex justify-between font-sans text-sm text-sage">
                       <span>Ваучер</span>
@@ -526,9 +462,9 @@ export default function CheckoutPage() {
                   <div className="flex justify-between">
                     <span className="font-serif text-xl text-navy">Общо</span>
                     <span className="font-serif text-xl text-navy">
-                      {currentStep === 'shipping' && shippingCost === null
+                      {shippingCost === null
                         ? `${formatPrice(total)} + доставка`
-                        : formatPrice(currentStep === 'payment' ? totalPrice() - voucherDiscount : total)}
+                        : formatPrice(total)}
                     </span>
                   </div>
                 </div>
