@@ -239,33 +239,38 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
 
               {step === 'select' && (
                 <>
-                  <h3 className="font-serif text-xl text-navy mb-4 flex items-center gap-2">
-                    <Calendar className="w-5 h-5" />
-                    {sessions.length > 0 ? 'Изберете дата и час' : 'Резервация'}
-                  </h3>
+                  <button
+                    onClick={() => {
+                      if (sessions.length > 0 && selectedSession === null) {
+                        toast.error('Моля, изберете дата и час')
+                        return
+                      }
+                      setStep('book')
+                    }}
+                    className="btn-primary w-full text-center mb-6"
+                  >
+                    Запиши се
+                  </button>
 
                   {sessions.length > 0 ? (
-                    <div className="space-y-3 mb-6">
-                      {sessions.map((s, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setSelectedSession(i)}
-                          disabled={s.spotsLeft === 0}
-                          className={`w-full text-left p-4 border-2 transition-colors ${
-                            selectedSession === i
-                              ? 'border-navy bg-navy text-cream'
-                              : s.spotsLeft === 0
-                              ? 'border-gray-200 text-gray-400 cursor-not-allowed'
-                              : 'border-cream bg-white hover:border-navy'
-                          }`}
-                        >
-                          <p className="font-sans text-sm font-medium mb-1">{formatDate(s.date)}</p>
-                          <p className="font-sans text-xs">{s.startTime} - {s.endTime}</p>
-                          <p className={`font-sans text-xs mt-1 ${selectedSession === i ? 'text-cream/70' : 'text-sage'}`}>
-                            {s.spotsLeft === 0 ? 'Няма места' : `${s.spotsLeft} свободни места`}
-                          </p>
-                        </button>
-                      ))}
+                    <div className="mb-6">
+                      <label className="block font-sans text-sm font-medium text-navy mb-2 flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        Изберете дата и час
+                      </label>
+                      <select
+                        value={selectedSession ?? ''}
+                        onChange={(e) => setSelectedSession(e.target.value === '' ? null : Number(e.target.value))}
+                        className="w-full border border-navy/20 px-4 py-3 font-sans text-sm text-navy bg-white focus:outline-none focus:border-navy appearance-none cursor-pointer"
+                      >
+                        <option value="">— изберете дата —</option>
+                        {sessions.map((s, i) => (
+                          <option key={i} value={i} disabled={s.spotsLeft === 0}>
+                            {formatDate(s.date)}, {s.startTime}–{s.endTime}
+                            {s.spotsLeft === 0 ? ' (няма места)' : ` · ${s.spotsLeft} места`}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   ) : (
                     <p className="font-sans text-sm text-navy/60 mb-6">
@@ -274,7 +279,7 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
                   )}
 
                   {selectedSession !== null && (
-                    <div className="mb-6">
+                    <div className="mb-2">
                       <p className="font-sans text-sm font-medium text-navy mb-3">Брой участници</p>
                       <div className="flex items-center border border-navy/20 w-full justify-between">
                         <button
@@ -296,19 +301,6 @@ export default function WorkshopDetailClient({ workshop }: { workshop: WorkshopD
                       </p>
                     </div>
                   )}
-
-                  <button
-                    onClick={() => {
-                      if (sessions.length > 0 && selectedSession === null) {
-                        toast.error('Моля, изберете дата и час')
-                        return
-                      }
-                      setStep('book')
-                    }}
-                    className="btn-primary w-full text-center"
-                  >
-                    Запиши се
-                  </button>
                 </>
               )}
 
